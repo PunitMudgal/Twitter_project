@@ -1,13 +1,22 @@
 import logo from "./assets/forever.png";
 import logo2 from "./assets/forever.svg";
+import { Routes, Route, BrowserRouter } from "react-router-dom";
+import ProtectRoutes from "./helper/ProtectRoutes";
+import SignIn from "./pages/SignIn";
+import Register from "./pages/Register";
+import Home from "./pages/Home";
 
 function App() {
   return (
-    <div className="App bg-slate-950">
-      <img className="h-64 invert" src={logo} alt="na mila" />
-      <h2 className="text-violet-600 font-bold">below is svg above is png</h2>
-      <img className="h-52 invert " src={logo2} alt="na mila" />
-    </div>
+    <>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<SignIn />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/home" element={<Home />} />
+        </Routes>
+      </BrowserRouter>
+    </>
   );
 }
 
