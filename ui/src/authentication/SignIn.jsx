@@ -6,22 +6,40 @@ import TextField from "@mui/material/TextField";
 
 import "../style/authenticationStyle.css";
 import logo from "../assets/blue.png";
-import { registerValidation } from "../helper/validation.js";
+import { loginVerify } from "../helper/validation.js";
+import { loginUser } from "../helper/helper";
+import toast, { Toaster } from "react-hot-toast";
 
 function SignIn() {
-  const { values, handleBlur, handleChange, handleSubmit } = useFormik({
+  const navigate = useNavigate();
+
+  const { values, handleChange, handleSubmit } = useFormik({
     initialValues: {
-      email: "",
+      emailOrUsername: "",
       password: "",
     },
-    validate: registerValidation,
+    validate: loginVerify,
     validateOnBlur: false,
     validateOnChange: false,
+    onSubmit: async (values, action) => {
+      let loginPromise = loginUser(values);
+      toast.promise(loginPromise, {
+        loading: "Logging In...",
+        success: "Login Success",
+        error: "Login Failed!",
+      });
+      loginPromise.then(function (res) {
+        let { token } = res.data;
+        localStorage.setItem("token", token);
+        navigate("/home");
+      });
+    },
   });
 
   return (
     <>
       <div className="h-screen flex flex-col justify-center items-center gap-[1vh] p-[4%] ">
+        <Toaster position="top-center" reverseOrder={false}></Toaster>
         <div className="flex flex-col gap-3 justify-center items-center">
           <img src={logo} alt="logo not found!" className="h-28 w-28 " />
           <p className="font-semibold text-2xl font-style1 md:text-xl">
@@ -47,12 +65,11 @@ function SignIn() {
           autoComplete="off"
         >
           <TextField
-            name="email"
+            name="emailOrUsername"
             className="authntication-input"
-            value={values.email}
-            onchange={handleChange}
-            onBlur={handleBlur}
-            label="Email"
+            value={values.emailOrUsername}
+            onChange={handleChange}
+            label="Email or Username"
             variant="filled"
           />
           <TextField
@@ -61,8 +78,7 @@ function SignIn() {
             className="authntication-input"
             value={values.password}
             type="password"
-            onchange={handleChange}
-            onBlur={handleBlur}
+            onChange={handleChange}
             label="Password"
             variant="filled"
           />

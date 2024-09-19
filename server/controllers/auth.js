@@ -29,16 +29,7 @@ export const getAllUsers = async (req, res) => {
 /** REGISTER USER */
 export const register = async (req, res) => {
   try {
-    const {
-      name,
-      email,
-      username,
-      password,
-      follower,
-      following,
-      picturePath,
-      location,
-    } = req.body;
+    const { name, email, username, password } = req.body;
 
     const checkEmail = await User.findOne({ email });
     if (checkEmail) return res.status(400).send({ err: "user already exists" });
@@ -47,14 +38,10 @@ export const register = async (req, res) => {
     const passwordHash = await bcrypt.hash(password, salt);
 
     const newUser = new User({
-      name: name.toLowerCase(),
+      name: "User" + Math.floor(Math.random() * 5000),
       email: email.toLowerCase(),
       password: passwordHash,
       username,
-      picturePath,
-      follower,
-      following,
-      location,
     });
 
     newUser
@@ -70,9 +57,12 @@ export const register = async (req, res) => {
 
 /** LOGIN USER */
 export async function login(req, res) {
+  const { emailOrUsername, password } = req.body;
   try {
-    const { email, password } = req.body;
-    const user = await User.findOne({ email });
+    const user = await User.findOne({
+      $or: [{ email: emailOrUsername }, { username: emailOrUsername }],
+    });
+
     if (!user) return res.status(400).json({ msg: "user doesnot exist" });
 
     const isMatch = await bcrypt.compare(password, user.password);
@@ -85,7 +75,6 @@ export async function login(req, res) {
     delete user.password;
     res.status(200).json({ token, user });
   } catch (error) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: error.message });
   }
 }
-// tomorrow i'm gonna try to run this backend code in postman

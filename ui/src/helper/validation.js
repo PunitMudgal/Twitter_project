@@ -10,7 +10,7 @@ export async function registerValidation(values) {
 
 export async function loginVerify(values) {
   const errors = passwordVerify({}, values);
-  emailVerify(errors, values);
+  emailOrUsernameVerify(errors, values);
   return errors;
 }
 
@@ -46,3 +46,12 @@ function emailVerify(error = {}, values) {
   }
   return error;
 }
+
+const emailOrUsernameVerify = (error = {}, values) => {
+  if (!values.emailOrUsername) {
+    error.emailOrUsername = toast.error("Email or Username Required");
+  } else if (values.emailOrUsername.includes(" ")) {
+    error.emailOrUsername = toast.error("Username Cannot Contain Space");
+  }
+  return error;
+};
