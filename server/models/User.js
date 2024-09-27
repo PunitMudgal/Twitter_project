@@ -33,11 +33,26 @@ const UserScheme = new mongoose.Schema(
       type: Array,
       default: [],
     },
-    picturePath: {
+    profilePicturePath: {
       type: String,
       default: "",
     },
-    location: String,
+    coverPicture: {
+      type: String,
+      default: "",
+    },
+    isAdmin: {
+      type: Boolean,
+      default: false,
+    },
+    bio: {
+      type: String,
+      max: 50,
+    },
+    from: {
+      type: String,
+      max: 50,
+    },
   },
   { timestamps: true }
 );

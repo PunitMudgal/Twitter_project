@@ -10,6 +10,10 @@
   /* top: 0; */
 }
 
+.whole-background {
+  background: linear-gradient(to right, rgb(5, 117, 230), rgb(2, 27, 121));
+}
+
 .authntication-form {
   display: flex;
   flex-direction: column;

@@ -29,24 +29,38 @@ export const getAllUsers = async (req, res) => {
 /** REGISTER USER */
 export const register = async (req, res) => {
   try {
-    const { name, email, username, password } = req.body;
+    const { email, username, password } = req.body;
 
     const checkEmail = await User.findOne({ email });
-    if (checkEmail) return res.status(400).send({ err: "user already exists" });
+    const checkUsername = await User.findOne({ username });
+    if (checkEmail || checkUsername)
+      return res.status(400).send({ err: "user already exists" });
 
-    const salt = await bcrypt.genSalt();
+    const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(password, salt);
 
+    // crerate new user
     const newUser = new User({
       name: "User" + Math.floor(Math.random() * 5000),
       email: email.toLowerCase(),
       password: passwordHash,
-      username,
+      username: username.toLowerCase(),
     });
 
+    // save new user & generate token
     newUser
       .save()
-      .then(res.status(201).send({ msg: "user registered successful" }))
+      .then(async () => {
+        const user = await User.findOne({ email });
+        const token = jwt.sign(
+          { userId: user._id, email, username },
+          process.env.JWT_SECRET,
+          { expiresIn: "48h" }
+        );
+        const userObj = user.toObject(); // Convert to plain object
+        delete userObj.password; // Remove sensitive information
+        res.status(201).json({ token, user: userObj });
+      })
       .catch((error) =>
         res.status(500).send({ err: "unable to save user", error })
       );
@@ -60,20 +74,25 @@ export async function login(req, res) {
   const { emailOrUsername, password } = req.body;
   try {
     const user = await User.findOne({
-      $or: [{ email: emailOrUsername }, { username: emailOrUsername }],
+      $or: [
+        { email: emailOrUsername.toLowerCase() },
+        { username: emailOrUsername.toLowerCase() },
+      ],
     });
 
-    if (!user) return res.status(400).json({ msg: "user doesnot exist" });
+    if (!user) return res.status(400).json({ msg: "Invalid credentials" });
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ msg: "invalid credentials" });
+    if (!isMatch) return res.status(400).json({ msg: "Invalid credentials" });
 
     const token = jwt.sign(
       { userId: user._id, email: user.email, username: user.username },
-      process.env.JWT_SECRET
+      process.env.JWT_SECRET,
+      { expiresIn: "48h" }
     );
-    delete user.password;
-    res.status(200).json({ token, user });
+    const userObj = user.toObject(); // Convert to plain object
+    delete userObj.password; // Remove sensitive information
+    res.status(200).json({ token, user: userObj });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

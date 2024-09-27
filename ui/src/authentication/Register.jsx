@@ -4,17 +4,20 @@ import { Link, useNavigate } from "react-router-dom";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import { Toaster, toast } from "react-hot-toast";
+import { useDispatch } from "react-redux";
 
 import "../style/authenticationStyle.css";
 import logo from "../assets/blue.png";
 import { registerValidation } from "../helper/validation.js";
 import { registerUser } from "../helper/helper";
+import { setToken, setUser } from "../store/authSlice";
 
 function Register() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [isConfPassCorrenct, setIsconfPassCorrect] = useState(false);
 
-  const { values, handleBlur, handleChange, handleSubmit } = useFormik({
+  const { values, handleChange, handleSubmit } = useFormik({
     initialValues: {
       username: "",
       email: "",
@@ -26,15 +29,39 @@ function Register() {
     validateOnChange: false,
     onSubmit: async (values, action) => {
       values = await Object.assign(values);
-      let registerPromise = registerUser(values);
-      toast.promise(registerPromise, {
-        loading: "Creating...",
-        success: "Register Successful",
-        error: "Registration Failed",
-      });
-      registerPromise.then(function () {
-        navigate("/home");
-      });
+      try {
+        let registerPromise = registerUser(values);
+
+        // Using toast for notificatino feedback
+        toast.promise(registerPromise, {
+          loading: "Creating...",
+          success: "Register Successful",
+          error: "Registration Failed",
+        });
+
+        // Await the promise and get the response
+        const res = await registerPromise;
+
+        if (res && res.data) {
+          const { user, token } = res.data;
+          dispatch(setUser(user));
+          dispatch(setToken(token));
+          navigate("/register-profile");
+        } else toast.error("Invalid response from the server, Try again");
+      } catch (error) {
+        // Check if the backend returned a custom error message
+        if (
+          error.response &&
+          error.response.data &&
+          error.response.data.error
+        ) {
+          toast.error(error.response.data.error); // Show the error message from backend
+        } else {
+          toast.error("Registration Failed. Please try again later."); // Fallback for other errors
+        }
+      } finally {
+        action.setSubmitting(false); // Ensure submit state is reset
+      }
     },
   });
 
@@ -67,6 +94,7 @@ function Register() {
       >
         <TextField
           name="username"
+          error={values.username.includes(" ") ? true : false}
           className="authntication-input"
           value={values.username}
           onChange={handleChange}
@@ -83,8 +111,7 @@ function Register() {
         />
         <TextField
           name="password"
-          inert={true}
-          className="authntication-input"
+          className="authntication-input select-none"
           value={values.password}
           type="password"
           onChange={handleChange}
@@ -107,7 +134,7 @@ function Register() {
           variant="filled"
         />
 
-        <button type="submit" className="p-2 w-[30%] rounded-3xl bg-sky-500">
+        <button type="submit" className="p-2 w-[30%] rounded-3xl bg-blue1">
           Register
         </button>
       </Box>
@@ -116,7 +143,7 @@ function Register() {
         <p className="text-sm">Already have an account?</p>
         <Link
           to="/signin"
-          className="p-2 px-4 mt-2 w-full rounded-3xl border-2 border-sky-400 font-semibold hover:bg-sky-500 "
+          className="p-2 px-4 mt-2 w-full rounded-3xl border-2 border-blue1 font-semibold hover:bg-blue2 "
         >
           Log in
         </Link>

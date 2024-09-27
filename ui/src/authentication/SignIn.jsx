@@ -29,8 +29,9 @@ function SignIn() {
         error: "Login Failed!",
       });
       loginPromise.then(function (res) {
-        let { token } = res.data;
+        let { token, user } = res.data;
         localStorage.setItem("token", token);
+
         navigate("/home");
       });
     },

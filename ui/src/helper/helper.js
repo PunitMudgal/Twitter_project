@@ -1,16 +1,14 @@
 import axios from "axios";
 import jwt_decode from "jwt-decode";
-// import dotenv from "dotenv";
+import { useSelector } from "react-redux";
 
-// dotenv.config();
-// axios.defaults.baseURL = process.env.REACT_APP_BACKEND_SERVER_URL;
 axios.defaults.baseURL = "http://localhost:1414";
 
 /** REGISTER USER */
 export async function registerUser(userData) {
   try {
-    await axios.post(`/auth/register`, userData);
-    return Promise.resolve();
+    const response = await axios.post(`/auth/register`, userData);
+    return response;
   } catch (error) {
     return Promise.reject({ error });
   }
@@ -26,5 +24,20 @@ export async function loginUser({ emailOrUsername, password }) {
     return Promise.resolve({ data });
   } catch (error) {
     return Promise.reject({ error: "Wrong Credentials" });
+  }
+}
+
+/** UPDATE USER */
+export async function updateUser(values, token) {
+  try {
+    await axios.patch("/user/update", values, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return;
+  } catch (error) {
+    console.error("error response", error.response);
+    throw new Error("Wrong Credentials");
   }
 }

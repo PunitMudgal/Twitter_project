@@ -21,7 +21,7 @@ function usernameVerify(error = {}, values) {
     error.username = toast.error("Username Required!");
   } else if (values.username.includes(" ")) {
     error.username = toast.error("username cannot contain space");
-  } else if (values.username.length < 2 || values.username.length > 12) {
+  } else if (values.username.length < 3 || values.username.length > 22) {
     error.username = toast.error("Undefined length!");
   }
   return error;
