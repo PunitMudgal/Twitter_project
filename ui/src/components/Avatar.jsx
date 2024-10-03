@@ -17,7 +17,7 @@ function Avatar() {
         }
         alt="avatar"
         className={`h-12 w-12 rounded-full object-cover ${
-          isAdmin ? "border-2 border-[#FFD700]" : ""
+          isAdmin ? "border border-[#FFD700]" : ""
         } `}
       />
     </Link>

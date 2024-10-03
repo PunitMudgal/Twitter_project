@@ -1,5 +1,6 @@
 import Avatar from "../Avatar";
 import tick from "../../assets/tick.png";
+import logo from "../../assets/white.png";
 import moreIcon from "../../assets/more.svg";
 import menuIcon from "../../assets/menu.svg";
 import homeIcon from "../../assets/home.svg";
@@ -60,7 +61,13 @@ function LeftComp() {
 
   return (
     <>
-      <div className="col-span-3 flex flex-col justify-between p-2 relative ">
+      <div className="col-span-3 flex flex-col justify-between relative ">
+        {/* head logo */}
+        <div className="sticky top-0 mx-auto bg-gray-00 w-full h-12 mb-2 ">
+          <img src={logo} alt="forever_logo" className=" h-11 w-auto m-auto" />
+        </div>
+
+        {/* icons */}
         <div className="flex flex-col place-items-start gap-3 ml-[37%] p-3 font-style2">
           {Icons.map((icon) => (
             <Link

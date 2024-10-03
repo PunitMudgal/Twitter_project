@@ -1,5 +1,4 @@
 import React from "react";
-import Header from "../components/Header";
 import { Outlet } from "react-router-dom";
 import Authentication from "./Authentication";
 import Register from "../authentication/Register";
@@ -9,7 +8,9 @@ export function AppLayoutAuthentication() {
     <>
       <div className="flex z-10">
         <Authentication />
-        <div className="bg-blue6 flex-grow">{<Outlet />}</div>
+        <div className="bg-blue6 flex-grow">
+          <Outlet />
+        </div>
       </div>
     </>
   );
@@ -27,7 +28,7 @@ export function AppLayoutRegister() {
 export function AppLayoutMain() {
   return (
     <>
-      <Header />
+      {/* <Header /> */}
       <Outlet />
     </>
   );

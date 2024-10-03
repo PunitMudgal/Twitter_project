@@ -4,8 +4,7 @@ import { useSelector } from "react-redux";
 import TextField from "@mui/material/TextField";
 import { toast } from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
-import { NavigateNext } from "@mui/icons-material";
-
+import skipIcon from "../assets/next.svg";
 import "../style/registerProfile.css";
 import { updateUser } from "../helper/helper";
 import avatar from "../assets/profile.png";
@@ -82,8 +81,11 @@ function RegisterProfileCard() {
           <p className="font-semibold text-xl text-center text-gray-300">
             Set Profile photo
           </p>
-          <Link to="/home" className="absolute right-0 ">
-            Skip <NavigateNext />{" "}
+          <Link
+            to="/home"
+            className="absolute inline-flex items-center right-0 hover:underline"
+          >
+            Skip <img className="h-5 invert w-auto" src={skipIcon} alt="skip" />{" "}
           </Link>
         </div>
         <Box

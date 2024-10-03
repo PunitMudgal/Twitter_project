@@ -35,8 +35,7 @@ function App() {
       path: "home",
       element: (
         <ProtectRoutes>
-          {" "}
-          <AppLayoutMain />{" "}
+          <AppLayoutMain />
         </ProtectRoutes>
       ),
       children: [

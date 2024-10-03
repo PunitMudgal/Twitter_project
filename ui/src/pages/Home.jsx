@@ -16,7 +16,7 @@ function Home() {
       </h1>
     );
   return (
-    <div className="grid grid-cols-12 min-h-[calc(100vh-48px)] w-full overflow-hidden ">
+    <div className="grid grid-cols-12 min-h-screen w-full overflow-hidden ">
       <LeftComp />
       <CenterComp isLoading={isLoading} />
       <RightComp />
