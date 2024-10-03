@@ -3,20 +3,21 @@ import ProtectRoutes from "./helper/ProtectRoutes";
 import Home from "./pages/Home";
 import SignIn from "./authentication/SignIn";
 import RegisterProfileCard from "./authentication/RegisterProfileCard";
-import {
-  AppLayoutMain,
-  AppLayoutAuthentication,
-  AppLayoutRegister,
-} from "./pages/AppLayout";
+import { AppLayoutAuthentication, AppLayoutRegister } from "./pages/AppLayout";
+import CenterComp from "./components/homePageComp/CenterComp";
+import Profile from "./pages/Profile";
+import useFetchHook from "./hook/fetchHook";
 
 function App() {
+  const { isLoading, serverError } = useFetchHook();
+
   const router = createBrowserRouter([
     {
       path: "/",
       element: <AppLayoutAuthentication />,
       children: [
         {
-          path: "/",
+          path: "",
           element: <AppLayoutRegister />,
           children: [
             {
@@ -35,34 +36,40 @@ function App() {
       path: "home",
       element: (
         <ProtectRoutes>
-          <AppLayoutMain />
+          <Home serverError={serverError} />
         </ProtectRoutes>
       ),
       children: [
         {
-          path: "/home",
-          element: <Home />,
+          path: "",
+          element: <CenterComp isLoading={isLoading} />,
         },
         {
-          path: "",
-          element: "",
+          path: "profile",
+          element: <Profile />,
         },
       ],
     },
   ]);
+
   return (
     <>
       <RouterProvider router={router} />
-      {/* // *old method of router*
-       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Authentication Elem={Register} />} />
-          <Route path="/signin" element={<Authentication Elem={SignIn} />} />
-          <Route path="/home" element={<Home />} />
-        </Routes>
-      </BrowserRouter> */}
     </>
   );
 }
 
 export default App;
+// path: "/home",
+// element: "",
+// children: [
+//   {
+//     path: "/",
+//     element: <AppLayoutMain />,
+//     children: [
+//       { path: "/", element: <LeftComp /> },
+//       { path: "/", element: <CenterComp /> },
+//       { path: "/", element: <RightComp /> },
+//     ],
+//   },
+// ],

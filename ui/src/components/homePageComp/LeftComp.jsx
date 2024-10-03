@@ -71,6 +71,7 @@ function LeftComp() {
         <div className="flex flex-col place-items-start gap-3 ml-[37%] p-3 font-style2">
           {Icons.map((icon) => (
             <Link
+              to={`/${icon.name === "home" ? "home" : `home/${icon.name}`}`}
               key={icon.name}
               className="flex gap-3 text-xl items-center p-2 rounded-3xl capitalize  hover:bg-purple-500 hover:bg-opacity-20 "
             >
@@ -126,3 +127,4 @@ function LeftComp() {
 }
 
 export default LeftComp;
+// to={icon.name === "profile" ? "/home/profile" : null}

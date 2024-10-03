@@ -8,7 +8,7 @@ function Avatar() {
     (state) => state.auth?.user || {}
   );
   return (
-    <Link>
+    <Link to="/home/profile">
       <img
         src={
           profilePicturePath

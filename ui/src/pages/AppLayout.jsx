@@ -24,12 +24,3 @@ export function AppLayoutRegister() {
     </>
   );
 }
-
-export function AppLayoutMain() {
-  return (
-    <>
-      {/* <Header /> */}
-      <Outlet />
-    </>
-  );
-}

@@ -45,6 +45,8 @@ export const register = async (req, res) => {
       email: email.toLowerCase(),
       password: passwordHash,
       username: username.toLowerCase(),
+      bio: "",
+      from: "",
     });
 
     // save new user & generate token
