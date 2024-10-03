@@ -12,7 +12,8 @@ export default function useFetchHook(query) {
   console.log("useFetchHook called");
   const dispatch = useDispatch();
   // Memoize token to prevent recomputation on every render
-  const token = useMemo(() => localStorage.getItem("token"), []);
+  // const token = useMemo(() => localStorage.getItem("token"), []);
+  const token = localStorage.getItem("token");
 
   const [getData, setData] = useState({
     isLoading: false,
@@ -52,7 +53,7 @@ export default function useFetchHook(query) {
       }
     };
 
-    if (token && !user) fetchData();
+    token && fetchData();
   }, [token, query, dispatch]);
 
   return [getData, setData];

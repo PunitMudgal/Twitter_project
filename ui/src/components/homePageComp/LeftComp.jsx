@@ -72,7 +72,7 @@ function LeftComp() {
             </Link>
           ))}
 
-          <button className="rounded-3xl p-2 w-full bg-violet-700 ">
+          <button className="rounded-3xl p-2 w-full bg-violet-70 purple-gradient">
             Post
           </button>
         </div>

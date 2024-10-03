@@ -19,13 +19,6 @@ a {
 
 body {
   background-color: black;
-  /* background: rgb(3, 28, 54);
-  background: linear-gradient(
-    56deg,
-    rgba(3, 28, 54, 1) 0%,
-    rgba(6, 34, 61, 1) 50%,
-    rgba(4, 27, 52, 1) 100%
-  ); */
 
   min-height: 100vh;
   font-family: "Noto Sans HK", sans-serif;
@@ -37,4 +30,11 @@ body {
 
 input:focus {
   outline: none;
+}
+
+.purple-gradient {
+  /* background-color: #4062bb;
+  background-image: linear-gradient(316deg, #4062bb 0%, #5200ae 74%); */
+  background-color: #3e187a;
+  background-image: linear-gradient(316deg, #3e187a 0%, #994ecc 74%);
 }

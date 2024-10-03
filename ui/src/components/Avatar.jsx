@@ -7,7 +7,6 @@ function Avatar() {
   const { profilePicturePath, isAdmin } = useSelector(
     (state) => state.auth?.user || {}
   );
-  let profile;
   return (
     <Link>
       <img
