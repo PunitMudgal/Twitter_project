@@ -1,6 +1,5 @@
 import React from "react";
 import Header from "../components/Header";
-import Footer from "../components/Footer";
 import { Outlet } from "react-router-dom";
 import Authentication from "./Authentication";
 import Register from "../authentication/Register";
@@ -30,7 +29,6 @@ export function AppLayoutMain() {
     <>
       <Header />
       <Outlet />
-      <Footer />
     </>
   );
 }

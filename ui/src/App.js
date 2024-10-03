@@ -33,10 +33,15 @@ function App() {
     },
     {
       path: "home",
-      element: <AppLayoutMain />,
+      element: (
+        <ProtectRoutes>
+          {" "}
+          <AppLayoutMain />{" "}
+        </ProtectRoutes>
+      ),
       children: [
         {
-          path: "home",
+          path: "/home",
           element: <Home />,
         },
         {

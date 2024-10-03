@@ -77,7 +77,7 @@ function RegisterProfileCard() {
       <div className="w-full h-full bg-black bg-opacity-55 backdrop-blur-sm absolute top-0 left-0 z-20" />
 
       {/* profile card */}
-      <div className="flex flex-col items-center justify-around p-3 absolute top-[40%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[30%] rounded-md bg-transparent bg-opacity-5 backdrop-blur-md border border-gray3 md:w-[90%] box z-30">
+      <div className="flex flex-col items-center justify-around p-3 absolute top-[40%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[30%] rounded-md bg-transparent bg-opacity-5 backdrop-blur-md border border-purple3 md:w-[90%] box z-30">
         <div className="flex  items-center">
           <p className="font-semibold text-xl text-center text-gray-300">
             Set Profile photo

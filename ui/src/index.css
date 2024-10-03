@@ -10,6 +10,7 @@
   margin: 0;
   --tw-text-opacity: 1;
   color: rgb(229 231 235 / var(--tw-text-opacity));
+  /* @apply bg-blue6; */
 }
 
 a {
@@ -17,10 +18,23 @@ a {
 }
 
 body {
+  background-color: black;
+  /* background: rgb(3, 28, 54);
+  background: linear-gradient(
+    56deg,
+    rgba(3, 28, 54, 1) 0%,
+    rgba(6, 34, 61, 1) 50%,
+    rgba(4, 27, 52, 1) 100%
+  ); */
+
   min-height: 100vh;
   font-family: "Noto Sans HK", sans-serif;
   margin: 0;
   min-width: 100vw;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+input:focus {
+  outline: none;
 }

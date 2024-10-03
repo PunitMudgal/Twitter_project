@@ -1,8 +1,14 @@
 import axios from "axios";
-import jwt_decode from "jwt-decode";
-import { useSelector } from "react-redux";
+import { jwtDecode } from "jwt-decode";
 
 axios.defaults.baseURL = "http://localhost:1414";
+
+export async function getUserFromToken() {
+  const token = localStorage.getItem("token");
+  if (!token) return Promise.reject("Token not found!");
+  let decode = jwtDecode(token);
+  return decode;
+}
 
 /** REGISTER USER */
 export async function registerUser(userData) {
