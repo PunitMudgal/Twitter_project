@@ -41,7 +41,15 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 /** ROUTES WITH FILES */
-app.patch("/user/update", Auth, upload.single("picture"), updateUser);
+app.patch(
+  "/user/update",
+  Auth,
+  upload.fields([
+    { name: "picture", maxCount: 1 }, // Accept one profile photo
+    { name: "backgroundPhoto", maxCount: 1 }, // Accept one background photo
+  ]),
+  updateUser
+);
 
 // ROUTES
 app.use("/auth", authRoutes);

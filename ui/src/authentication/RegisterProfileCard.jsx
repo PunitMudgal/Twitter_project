@@ -15,6 +15,7 @@ function RegisterProfileCard() {
 
   const [name, setName] = useState("");
   const [image, setImage] = useState(null);
+  const [previewProfile, setPreviewProfile] = useState(null);
 
   const navigate = useNavigate();
 
@@ -37,30 +38,6 @@ function RegisterProfileCard() {
       updatePromise.then(() => {
         navigate("/home");
       });
-
-      // const { values, handleChange, handleSubmit, setFieldValue } = useFormik({
-      //   initialValues: {
-      //     picture: "",
-      //     name: "",
-      //   },
-      //   onSubmit: async (values) => {
-      //     values = await Object.assign(values);
-      //     values = {
-      //       ...values,
-      //       picture: values.picture,
-      //       profilePicturePath: values.picture.name,
-      //     };
-
-      //     try {
-      //       let updatePromise = updateUser({ userId: user._id, values }, token);
-      //       await toast.promise(updatePromise, {
-      //         loading: "Updating Please wait...",
-      //         success: "Update successful",
-      //         error: "Update Error",
-      //       });
-      //       updatePromise.then(() => {
-      //         navigate("/home");
-      //       });
     } catch (error) {
       if (error.response && error.response.data && error.response.data.error) {
         toast.error(error.response.data.error); // Show the error message from backend
@@ -110,8 +87,8 @@ function RegisterProfileCard() {
         >
           <>
             <img
-              src={avatar}
-              className=" max-w-fit border-2 object-cover border-blue2 h-[20vh] w-auto rounded-full  hover:border-blue1"
+              src={previewProfile || avatar}
+              className=" w-32 h-32 border-2 object-cover border-blue2 rounded-full  hover:border-blue1"
               alt="avatar"
             />
             <label
@@ -121,7 +98,10 @@ function RegisterProfileCard() {
               {image?.name || "Upload Photo"}
             </label>
             <input
-              onChange={(e) => setImage(e.target.files[0])}
+              onChange={(e) => {
+                setImage(e.target.files[0]);
+                setPreviewProfile(URL.createObjectURL(e.target.files[0]));
+              }}
               type="file"
               name="picture"
               id="profile"

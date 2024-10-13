@@ -43,7 +43,27 @@ export async function updateUser(values, token) {
     });
     return;
   } catch (error) {
-    console.error("error response", error.response);
+    console.error("error response", error);
     throw new Error("Wrong Credentials");
+  }
+}
+
+// follow user
+export async function follow() {}
+
+// unfollow user
+export async function unfollow() {}
+
+// get Friends suggestion
+export async function getFriendSuggestion(userId, token) {
+  try {
+    const { data } = await axios.get(`user/suggestFriends/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return data;
+  } catch (error) {
+    throw new Error("Wrong credentials");
   }
 }

@@ -7,10 +7,11 @@ import { AppLayoutAuthentication, AppLayoutRegister } from "./pages/AppLayout";
 import CenterComp from "./components/homePageComp/CenterComp";
 import Profile from "./pages/Profile";
 import useFetchHook from "./hook/fetchHook";
+import ViewPhoto from "./components/ViewPhoto";
+import EditProfileInfoWidget from "./components/widget/EditProfileInfoWidget";
+import { Toaster } from "react-hot-toast";
 
 function App() {
-  const { isLoading, serverError } = useFetchHook();
-
   const router = createBrowserRouter([
     {
       path: "/",
@@ -36,40 +37,42 @@ function App() {
       path: "home",
       element: (
         <ProtectRoutes>
-          <Home serverError={serverError} />
+          <Home />
         </ProtectRoutes>
       ),
       children: [
         {
           path: "",
-          element: <CenterComp isLoading={isLoading} />,
+          element: <CenterComp isLoading={false} />,
         },
         {
-          path: "profile",
+          path: ":id",
           element: <Profile />,
+          children: [
+            {
+              path: "edit",
+              element: <EditProfileInfoWidget />,
+            },
+          ],
         },
       ],
+    },
+    {
+      path: "/:userId/photo",
+      element: (
+        <ProtectRoutes>
+          <ViewPhoto />
+        </ProtectRoutes>
+      ),
     },
   ]);
 
   return (
     <>
+      <Toaster position="top-center" reverseOrder={false}></Toaster>
       <RouterProvider router={router} />
     </>
   );
 }
 
 export default App;
-// path: "/home",
-// element: "",
-// children: [
-//   {
-//     path: "/",
-//     element: <AppLayoutMain />,
-//     children: [
-//       { path: "/", element: <LeftComp /> },
-//       { path: "/", element: <CenterComp /> },
-//       { path: "/", element: <RightComp /> },
-//     ],
-//   },
-// ],

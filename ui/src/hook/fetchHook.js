@@ -9,7 +9,6 @@ axios.defaults.baseURL = "http://localhost:1414";
 export default function useFetchHook(query) {
   const user = useSelector((state) => state.auth.user);
 
-  console.log("useFetchHook called");
   const dispatch = useDispatch();
   // Memoize token to prevent recomputation on every render
   // const token = useMemo(() => localStorage.getItem("token"), []);

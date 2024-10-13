@@ -8,12 +8,21 @@ import {
 import { MdGif } from "react-icons/md";
 import { CgOptions } from "react-icons/cg";
 import { GrEmoji } from "react-icons/gr";
+import { useSelector } from "react-redux";
 
 function UploadWidget() {
+  const { profilePicturePath, _id } = useSelector(
+    (state) => state.auth?.user || {}
+  );
+
   return (
     <div className="p-4 border-b border-purple-700 w-full h-fit">
       <div className="flex gap-2 w-full items-center ">
-        <Avatar className="flex-shrink-0 " />
+        <Avatar
+          className="flex-shrink-0 "
+          profilePhoto={profilePicturePath}
+          userId={_id}
+        />
         <input
           type="text"
           className="bg-transparent text-lg p-2 text-gray1 flex-grow "

@@ -1,26 +1,21 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import defaultPhoto from "../assets/profile.png";
-import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
-function Avatar() {
-  const { profilePicturePath, isAdmin } = useSelector(
-    (state) => state.auth?.user || {}
-  );
+function Avatar({ profilePhoto, userId }) {
+  const navigate = useNavigate();
+
   return (
-    <Link to="/home/profile">
-      <img
-        src={
-          profilePicturePath
-            ? `http://localhost:1414/assets/${profilePicturePath}`
-            : defaultPhoto
-        }
-        alt="avatar"
-        className={`h-12 w-12 rounded-full object-cover ${
-          isAdmin ? "border border-[#FFD700]" : ""
-        } `}
-      />
-    </Link>
+    <img
+      onClick={() => navigate(`/home/${userId}`)}
+      src={
+        profilePhoto
+          ? `http://localhost:1414/assets/${profilePhoto}`
+          : defaultPhoto
+      }
+      alt="avatar"
+      className="h-12 w-12 rounded-full object-cover cursor-pointer"
+    />
   );
 }
 

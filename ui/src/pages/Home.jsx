@@ -1,10 +1,12 @@
 import LeftComp from "../components/homePageComp/LeftComp";
 import RightComp from "../components/homePageComp/RightComp";
-import CenterComp from "../components/homePageComp/CenterComp";
 import { useSelector } from "react-redux";
 import { Outlet } from "react-router-dom";
+import useFetchHook from "../hook/fetchHook";
+import Loading from "../components/Loading";
 
-function Home({ serverError }) {
+function Home() {
+  const { isLoading, serverError } = useFetchHook();
   const user = useSelector((state) => state.auth.user);
 
   if (serverError)
@@ -13,8 +15,10 @@ function Home({ serverError }) {
         Server Error Please try again...
       </h1>
     );
+
+  if (isLoading) return <Loading />;
   return (
-    <div className="grid grid-cols-12 min-h-screen w-full overflow-hidden ">
+    <div className="grid grid-cols-12 h-screen overflow-y-hidden  ">
       <LeftComp />
       <Outlet />
       <RightComp />
