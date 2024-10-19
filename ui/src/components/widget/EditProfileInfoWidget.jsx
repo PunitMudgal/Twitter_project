@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { RxCross1 } from "react-icons/rx";
 import { useNavigate } from "react-router-dom";
-import { updateUser } from "../../helper/helper";
+import { updateUser } from "../../fetch/helper";
 import { toast } from "react-hot-toast";
 import { MdOutlineAddAPhoto } from "react-icons/md";
 import { useSelector } from "react-redux";

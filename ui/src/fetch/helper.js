@@ -49,10 +49,46 @@ export async function updateUser(values, token) {
 }
 
 // follow user
-export async function follow() {}
+export async function follow(userId, friendId, token) {
+  try {
+    await axios.put(
+      `/user/${friendId}/follow`,
+      { userId },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return;
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message ||
+        "An error occurred while following the user."
+    );
+  }
+}
 
 // unfollow user
-export async function unfollow() {}
+export async function unfollow(userId, friendId, token) {
+  try {
+    await axios.put(
+      `/user/${friendId}/unfollow`,
+      { userId },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return;
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message ||
+        "An error occurred while following the user."
+    );
+  }
+}
 
 // get Friends suggestion
 export async function getFriendSuggestion(userId, token) {
@@ -65,5 +101,27 @@ export async function getFriendSuggestion(userId, token) {
     return data;
   } catch (error) {
     throw new Error("Wrong credentials");
+  }
+}
+
+// Fetch User's friends
+export async function getAllFriends(following, token) {
+  if (following && token) {
+    try {
+      const { data } = await axios.post(
+        `user/getAllFriends`,
+        { following },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      return data;
+    } catch (error) {
+      throw new Error("Wrong Credentials");
+    }
+  } else {
+    throw new Error("Following list or token is missing");
   }
 }

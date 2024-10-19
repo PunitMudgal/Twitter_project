@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { getUserFromToken } from ".././helper/helper.js";
+import { getUserFromToken } from "./helper.js";
 import { useEffect, useMemo, useState } from "react";
 import { setFriendProfile, setUser } from "../store/authSlice.js";
 import axios from "axios";

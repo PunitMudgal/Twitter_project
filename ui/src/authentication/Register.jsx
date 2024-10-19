@@ -9,7 +9,7 @@ import { useDispatch } from "react-redux";
 import "../style/authenticationStyle.css";
 import logo from "../assets/blue.png";
 import { registerValidation } from "../helper/validation.js";
-import { registerUser } from "../helper/helper";
+import { registerUser } from "../fetch/helper";
 import { setToken, setUser } from "../store/authSlice";
 
 function Register() {

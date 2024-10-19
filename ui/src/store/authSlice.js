@@ -3,15 +3,8 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   user: null,
   friendProfile: null,
+  friends: [],
   token: localStorage.getItem("token") || null,
-};
-
-// Truncate the username if it exceeds 14 characters
-export const truncateUsername = (username) => {
-  if (username?.length > 18) {
-    return username.slice(0, 15) + "...";
-  }
-  return username;
 };
 
 export const authSlice = createSlice({
@@ -28,8 +21,22 @@ export const authSlice = createSlice({
       state.token = action.payload;
       localStorage.setItem("token", action.payload);
     },
+    setFriends: (state, action) => {
+      state.friends = action.payload;
+    },
   },
 });
 
-export const { setUser, setToken, setFriendProfile } = authSlice.actions;
+// Truncate the username if it exceeds 14 characters
+export const truncateUsername = (username) => {
+  if (username?.length > 18) {
+    return username.slice(0, 15) + "...";
+  }
+  return username;
+};
+
+// Fetch user's friends
+
+export const { setUser, setToken, setFriendProfile, setFriends } =
+  authSlice.actions;
 export default authSlice.reducer;

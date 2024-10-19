@@ -8,3 +8,11 @@
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
 }
+
+.button-following::after {
+  content: "following";
+}
+
+.button-following:hover::after {
+  content: "Unfollow";
+}

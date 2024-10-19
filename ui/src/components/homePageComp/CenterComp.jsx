@@ -1,7 +1,7 @@
 import React from "react";
 import UploadWidget from "../widget/UploadWidget";
 import Loading from "../Loading";
-import "../../style/centerComp.css";
+import "../../style/profile.css";
 import "../../index.css";
 
 function CenterComp({ isLoading }) {

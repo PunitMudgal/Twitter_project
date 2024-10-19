@@ -7,7 +7,7 @@ import TextField from "@mui/material/TextField";
 import "../style/authenticationStyle.css";
 import logo from "../assets/blue.png";
 import { loginVerify } from "../helper/validation.js";
-import { loginUser } from "../helper/helper";
+import { loginUser } from "../fetch/helper";
 import toast, { Toaster } from "react-hot-toast";
 
 function SignIn() {

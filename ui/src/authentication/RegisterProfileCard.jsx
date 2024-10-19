@@ -6,7 +6,7 @@ import { toast } from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
 import skipIcon from "../assets/next.svg";
 import "../style/registerProfile.css";
-import { updateUser } from "../helper/helper";
+import { updateUser } from "../fetch/helper";
 import avatar from "../assets/profile.png";
 
 function RegisterProfileCard() {

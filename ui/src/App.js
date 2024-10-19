@@ -6,7 +6,7 @@ import RegisterProfileCard from "./authentication/RegisterProfileCard";
 import { AppLayoutAuthentication, AppLayoutRegister } from "./pages/AppLayout";
 import CenterComp from "./components/homePageComp/CenterComp";
 import Profile from "./pages/Profile";
-import useFetchHook from "./hook/fetchHook";
+import useFetchHook from "./fetch/fetchHook";
 import ViewPhoto from "./components/ViewPhoto";
 import EditProfileInfoWidget from "./components/widget/EditProfileInfoWidget";
 import { Toaster } from "react-hot-toast";

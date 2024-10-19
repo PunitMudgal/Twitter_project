@@ -18,18 +18,21 @@ export const followUser = async (req, res) => {
     try {
       const user = await User.findById(req.params.id);
       const currentUser = await User.findById(req.body.userId);
+
       if (!user.follower.includes(req.body.userId)) {
         await user.updateOne({ $push: { follower: req.body.userId } });
         await currentUser.updateOne({ $push: { following: req.params.id } });
-        res.status(200).json("user has been followed");
+        return res.status(200).json({ message: "User has been followed" });
       } else {
-        res.status(403).json("you already follow this user");
+        return res
+          .status(403)
+          .json({ message: "You already follow this user" });
       }
     } catch (error) {
-      res.status(500).json(err);
+      return res.status(500).json({ message: error.message });
     }
   } else {
-    res.status(403).json("You can't follow yourself");
+    return res.status(403).json({ message: "You can't follow yourself" });
   }
 };
 
@@ -40,18 +43,19 @@ export const unfollowUser = async (req, res) => {
     try {
       const user = await User.findById(req.params.id);
       const currentUser = await User.findById(req.body.userId);
+
       if (user.follower.includes(req.body.userId)) {
         await user.updateOne({ $pull: { follower: req.body.userId } });
         await currentUser.updateOne({ $pull: { following: req.params.id } });
-        res.status(200).json("user has been unfollowed");
+        return res.status(200).json({ message: "user has been unfollowed" });
       } else {
-        res.status(403).json("you don't follow this user");
+        return res.status(403).json({ message: "you don't follow this user" });
       }
     } catch (error) {
-      res.status(500).json(err);
+      return res.status(500).json({ message: error.message });
     }
   } else {
-    res.status(403).json("you can't unfollow yourself!");
+    return res.status(403).json({ message: "you can't unfollow yourself!" });
   }
 };
 
@@ -109,6 +113,19 @@ export const getFriendSuggestions = async (req, res) => {
   } catch (error) {
     console.error("Error fetching friend suggestions:", error);
     res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Get user's all friends at once -> /user/getAllFriends
+export const getAllFriends = async (req, res) => {
+  const { following } = req.body;
+  try {
+    const friends = await User.find({ _id: { $in: following } }).select(
+      "name username profilePicturePath isAdmin _id"
+    );
+    res.status(200).json(friends);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch friends data", error });
   }
 };
 

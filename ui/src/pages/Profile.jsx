@@ -5,7 +5,7 @@ import tick from "../assets/tick.png";
 import defaultPhoto from "../assets/profile.png";
 import { IoCalendarOutline, IoLocationOutline } from "react-icons/io5";
 import message from "../assets/envelope.svg";
-import FetchHook from "../hook/fetchHook";
+import FetchHook from "../fetch/fetchHook";
 import Loading from "../components/Loading";
 
 function Profile() {
@@ -55,7 +55,7 @@ function Profile() {
         {/* main profile */}
         <div className="flex-grow flex-1 h-full relative overflow-hidden">
           {/* background image  */}
-          <div className="bg-zinc-800 w-full h-[26%] ">
+          <div className="bg-zinc-800 w-full h-[27%] ">
             {coverPicture && (
               <img
                 className="h-full w-full object-cover overflow-hidden "
@@ -124,8 +124,13 @@ function Profile() {
             </div>
             {/* folower and following */}
             <div className="flex items-center gap-4 text-sm text-gray2 ">
-              <p>{following?.length} Following</p>
-              <p>{follower?.length} Follower</p>
+              <p>
+                {following?.length}{" "}
+                <span className="text-gray2">Following</span>
+              </p>
+              <p>
+                {follower?.length} <span className="text-gray2">Follower</span>
+              </p>
             </div>
           </div>
 
