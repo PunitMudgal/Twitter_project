@@ -9,7 +9,8 @@ router.get("/:id", controller.getUser);
 router.get("/suggestFriends/:userId", Auth, controller.getFriendSuggestions);
 
 /** POST */
-router.post("/getAllFriends", Auth, controller.getAllFriends);
+router.post("/getAllFollowing", Auth, controller.getAllFollowing);
+router.post("/getAllFollower", Auth, controller.getAllFollower);
 
 /** PUT */
 router.put("/:id/follow", Auth, controller.followUser);

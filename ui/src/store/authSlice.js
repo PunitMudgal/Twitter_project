@@ -3,7 +3,8 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   user: null,
   friendProfile: null,
-  friends: [],
+  following: [],
+  follower: [],
   token: localStorage.getItem("token") || null,
 };
 
@@ -21,8 +22,11 @@ export const authSlice = createSlice({
       state.token = action.payload;
       localStorage.setItem("token", action.payload);
     },
-    setFriends: (state, action) => {
-      state.friends = action.payload;
+    setFollowing: (state, action) => {
+      state.following = action.payload;
+    },
+    setFollower: (state, action) => {
+      state.follower = action.payload;
     },
   },
 });
@@ -37,6 +41,11 @@ export const truncateUsername = (username) => {
 
 // Fetch user's friends
 
-export const { setUser, setToken, setFriendProfile, setFriends } =
-  authSlice.actions;
+export const {
+  setUser,
+  setToken,
+  setFriendProfile,
+  setFollowing,
+  setFollower,
+} = authSlice.actions;
 export default authSlice.reducer;

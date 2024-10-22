@@ -1,6 +1,6 @@
 import { useSelector } from "react-redux";
 import backIcon from "../assets/next.svg";
-import { Outlet, useNavigate, useParams } from "react-router-dom";
+import { Outlet, useNavigate, useParams, Link } from "react-router-dom";
 import tick from "../assets/tick.png";
 import defaultPhoto from "../assets/profile.png";
 import { IoCalendarOutline, IoLocationOutline } from "react-icons/io5";
@@ -10,6 +10,7 @@ import Loading from "../components/Loading";
 
 function Profile() {
   const {
+    _id,
     name,
     username,
     profilePicturePath,
@@ -35,7 +36,7 @@ function Profile() {
         {/* header */}
         <div className="sticky top-0 w-full bg-black bg-opacity5 backdrop-blur-md h-[48px] flex font-style2 self-center text-center text-lg text-gray1 p-1 items-center gap-8">
           <img
-            className="invert h-6 w-auto rotate-180"
+            className="invert h-10 w-auto rotate-180 p-2 hover:bg-gray-950 hover:bg-opacity-15 rounded-full"
             src={backIcon}
             alt="back"
             onClick={() => navigate(-1)}
@@ -45,7 +46,7 @@ function Profile() {
             <p className="text-2xl flex items-center gap-1">
               {name}{" "}
               {isAdmin && (
-                <img src={tick} className="h-5 w-auto " alt="purpletick" />
+                <img src={tick} className="h-4 w-auto " alt="purpletick" />
               )}{" "}
             </p>
             <p className="text-xs text-gray-400">114 posts</p>
@@ -126,10 +127,21 @@ function Profile() {
             <div className="flex items-center gap-4 text-sm text-gray2 ">
               <p>
                 {following?.length}{" "}
-                <span className="text-gray2">Following</span>
+                <Link
+                  to={`/home/${_id}/follower&following`}
+                  className="text-gray2 hover:underline"
+                >
+                  Following
+                </Link>
               </p>
               <p>
-                {follower?.length} <span className="text-gray2">Follower</span>
+                {follower?.length}{" "}
+                <Link
+                  to={`/home/${_id}/follower&following`}
+                  className="text-gray2 hover:underline"
+                >
+                  Follower
+                </Link>
               </p>
             </div>
           </div>

@@ -10,6 +10,7 @@ import useFetchHook from "./fetch/fetchHook";
 import ViewPhoto from "./components/ViewPhoto";
 import EditProfileInfoWidget from "./components/widget/EditProfileInfoWidget";
 import { Toaster } from "react-hot-toast";
+import FollowerAndFollowing from "./components/widget/FollowerAndFollowing";
 
 function App() {
   const router = createBrowserRouter([
@@ -54,6 +55,10 @@ function App() {
               element: <EditProfileInfoWidget />,
             },
           ],
+        },
+        {
+          path: ":id/follower&following",
+          element: <FollowerAndFollowing />,
         },
       ],
     },

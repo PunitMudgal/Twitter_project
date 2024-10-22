@@ -105,11 +105,11 @@ export async function getFriendSuggestion(userId, token) {
 }
 
 // Fetch User's friends
-export async function getAllFriends(following, token) {
+export async function getAllFollowing(following, token) {
   if (following && token) {
     try {
       const { data } = await axios.post(
-        `user/getAllFriends`,
+        `user/getAllFollowing`,
         { following },
         {
           headers: {
@@ -123,5 +123,26 @@ export async function getAllFriends(following, token) {
     }
   } else {
     throw new Error("Following list or token is missing");
+  }
+}
+
+export async function getAllFollower(follower, token) {
+  if (follower && token) {
+    try {
+      const { data } = await axios.post(
+        `user/getAllFollower`,
+        { follower },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      return data;
+    } catch (error) {
+      throw new Error("Wrong Credentials");
+    }
+  } else {
+    throw new Error("follower list or token is missing");
   }
 }

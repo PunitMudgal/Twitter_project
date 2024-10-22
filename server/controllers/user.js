@@ -116,14 +116,27 @@ export const getFriendSuggestions = async (req, res) => {
   }
 };
 
-// Get user's all friends at once -> /user/getAllFriends
-export const getAllFriends = async (req, res) => {
+// Get user's all following at once -> /user/getAllFollowing
+export const getAllFollowing = async (req, res) => {
   const { following } = req.body;
   try {
-    const friends = await User.find({ _id: { $in: following } }).select(
+    const followings = await User.find({ _id: { $in: following } }).select(
       "name username profilePicturePath isAdmin _id"
     );
-    res.status(200).json(friends);
+    res.status(200).json(followings);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch friends data", error });
+  }
+};
+
+// Get user's all follower at once -> /user/getAllFollower
+export const getAllFollower = async (req, res) => {
+  const { follower } = req.body;
+  try {
+    const followers = await User.find({ _id: { $in: follower } }).select(
+      "name username profilePicturePath isAdmin _id"
+    );
+    res.status(200).json(followers);
   } catch (error) {
     res.status(500).json({ message: "Failed to fetch friends data", error });
   }

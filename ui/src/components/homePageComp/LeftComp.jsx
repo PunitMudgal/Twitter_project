@@ -13,7 +13,7 @@ import businessIcon from "../../assets/lightning.svg";
 import communitiesIcon from "../../assets/communities.svg";
 
 import { useEffect, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { setToken, truncateUsername } from "../../store/authSlice";
 
@@ -58,21 +58,31 @@ function LeftComp() {
   return (
     <div className="col-span-3 flex flex-col justify-between sticky top-0 overflow-hidden  ">
       {/* head logo */}
-      <div className="sticky top-0 mx-auto bg-black w-full h-[12] mb-2 ">
+      <Link
+        to="/home"
+        className="sticky top-0 mx-auto bg-black w-full h-[12] mb-2 "
+      >
         <img src={logo} alt="forever_logo" className=" h-11 w-auto m-auto" />
-      </div>
+      </Link>
 
       {/* icons */}
       <div className="flex flex-col place-items-start gap-3 ml-[37%] p-3 font-style2">
         {Icons.map((icon) => (
-          <Link
+          <NavLink
+            end
             to={`/${icon.name === "profile" ? `home/${_id}` : `${icon.name}`}`}
             key={icon.name}
-            className="flex gap-3 text-xl items-center p-2 rounded-3xl capitalize  hover:bg-purple-500 hover:bg-opacity-20 "
+            className={({ isActive }) =>
+              `${
+                isActive
+                  ? "bg-purple-500 bg-opacity-20 font-semibold"
+                  : "inactive-link"
+              } flex gap-3 text-xl items-center p-2 rounded-3xl capitalize  hover:bg-purple-500 hover:bg-opacity-20`
+            }
           >
             <img src={icon.icon} className="h-7 w-full invert " alt="icon" />
             <span>{icon.name}</span>
-          </Link>
+          </NavLink>
         ))}
 
         <button className="rounded-3xl p-2 w-full bg-violet-70 purple-gradient">
