@@ -56,7 +56,7 @@ function LeftComp() {
   }, []);
 
   return (
-    <div className="col-span-3 flex flex-col justify-between sticky top-0 overflow-hidden  ">
+    <div className="col-span-3 flex flex-col justify-between sticky top-0 overflow-hidden ">
       {/* head logo */}
       <Link
         to="/home"

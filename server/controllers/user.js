@@ -11,6 +11,25 @@ export const getUser = async (req, res) => {
   }
 };
 
+/** SEARCH USER */
+export const searchUser = async (req, res) => {
+  try {
+    const { name } = req.params;
+    const users = await User.find({
+      $or: [
+        { username: { $regex: `^${name}`, $options: "i" } },
+        { name: { $regex: `^${name}`, $options: "i" } },
+      ],
+      // $options: 'i' makes it case-insensitive
+    }).lean(); // lean() to return plain JavaScript objects instead of Mongoose documents
+    if (!users || users.length === 0)
+      return res.status(404).send({ err: "user not found!" });
+    return res.status(201).send(users);
+  } catch (error) {
+    return res.status(500).send({ msg: error.message });
+  }
+};
+
 // follow
 /** put -> user/:id/follow */
 export const followUser = async (req, res) => {

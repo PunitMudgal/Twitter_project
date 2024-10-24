@@ -45,7 +45,7 @@ function EditProfileInfoWidget() {
     setCoverPicture("");
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     try {
       const formData = new FormData();

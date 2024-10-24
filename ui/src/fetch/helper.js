@@ -33,6 +33,19 @@ export async function loginUser({ emailOrUsername, password }) {
   }
 }
 
+/** SEARCH USER */
+export async function searchUser(name, token) {
+  try {
+    const { data } = await axios.get(`/user/search/${name}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    console.log("data in seacth funciton ", data);
+    return data;
+  } catch (error) {}
+}
+
 /** UPDATE USER */
 export async function updateUser(values, token) {
   try {
@@ -144,5 +157,31 @@ export async function getAllFollower(follower, token) {
     }
   } else {
     throw new Error("follower list or token is missing");
+  }
+}
+
+export async function createPost(values, token) {
+  try {
+    const { data } = await axios.post(`/post`, values, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  } catch (error) {
+    throw new Error("Error while creating post");
+  }
+}
+
+/** */
+export async function getFriendPosts(userId, token) {
+  try {
+    const { data } = await axios.get(`/post/${userId}/posts`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return data;
+  } catch (error) {
+    throw new Error("Error while fetching user post");
   }
 }

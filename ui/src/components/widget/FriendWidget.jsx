@@ -26,7 +26,7 @@ function FriendWidget({
     }
     try {
       const followPromise = follow(currentUser._id, friendId, token);
-      await toast.promise(followPromise, {
+      toast.promise(followPromise, {
         loading: "Loading...",
         success: "Followed successfully",
         error: (err) => err.response?.data?.message,

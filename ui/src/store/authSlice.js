@@ -5,6 +5,7 @@ const initialState = {
   friendProfile: null,
   following: [],
   follower: [],
+  searchResult: [],
   token: localStorage.getItem("token") || null,
 };
 
@@ -28,6 +29,9 @@ export const authSlice = createSlice({
     setFollower: (state, action) => {
       state.follower = action.payload;
     },
+    setSearchResult: (state, action) => {
+      state.searchResult = action.payload;
+    },
   },
 });
 
@@ -47,5 +51,6 @@ export const {
   setFriendProfile,
   setFollowing,
   setFollower,
+  setSearchResult,
 } = authSlice.actions;
 export default authSlice.reducer;

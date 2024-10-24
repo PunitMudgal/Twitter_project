@@ -4,12 +4,13 @@ import Avatar from "../Avatar";
 import tick from "../../assets/tick.png";
 import chatIcon from "../../assets/chat.svg";
 import searchIcon from "../../assets/search.svg";
-import { truncateUsername } from "../../store/authSlice";
+import { setSearchResult, truncateUsername } from "../../store/authSlice";
 import { useEffect, useState } from "react";
 import {
   follow,
   getAllFollowing,
   getFriendSuggestion,
+  searchUser,
   unfollow,
 } from "../../fetch/helper";
 import Loading from "../Loading";
@@ -23,13 +24,14 @@ function RightComp() {
 
   const currentUser = useSelector((state) => state.auth?.user);
   const token = useSelector((state) => state.auth?.token);
+  const searchResult = useSelector((state) => state.auth?.searchResult);
 
   const [isRotating, setIsRotating] = useState(false);
   const [suggestedFriends, setSuggestedFriends] = useState([]);
   const [followings, setFollowings] = useState([]);
   const [suggestionLoading, setSuggestionLoading] = useState(true);
-
-  console.log("set suggested friends", suggestedFriends);
+  const [searchText, setSearchText] = useState("");
+  const [searchMenu, setSearchMenu] = useState(false);
 
   const handleRefreshClick = () => {
     setIsRotating(true);
@@ -61,7 +63,7 @@ function RightComp() {
   const fetchFollowing = async () => {
     try {
       const data = await getAllFollowing(currentUser?.following, token);
-      dispatch(setFollowings(data));
+      if (data) dispatch(setFollowings(data));
     } catch (error) {
       console.error("Error fetching friends:", error);
     }
@@ -73,6 +75,25 @@ function RightComp() {
     }
   }, [currentUser?.following, token]);
 
+  /** SEARCH USER */
+  const submitSearch = async () => {
+    if (searchText) {
+      const data = await searchUser(searchText.toLocaleLowerCase(), token);
+      dispatch(setSearchResult(data));
+    }
+  };
+
+  useEffect(() => {
+    if (searchMenu) {
+      const timer = setTimeout(() => submitSearch(), 400);
+
+      //clean up function
+      return () => {
+        clearTimeout(timer);
+      };
+    }
+  }, [searchText]);
+
   return (
     <div className="col-span-3 flex flex-col gap-4 sticky top-0 overflow-hidden ">
       {/* search bar (top) */}
@@ -82,13 +103,35 @@ function RightComp() {
             src={searchIcon}
             alt="search"
             className="h-9 p-2 w-auto invert"
+            onClick={submitSearch}
           />
           <input
+            onChange={(e) => setSearchText(e.target.value)}
+            value={searchText}
             type="text"
             placeholder="Search"
-            className="text-sm bg-transparent w-full p-1 "
+            className="text-sm bg-transparent w-full p-1 focus:outline-2 outline-purple-600 "
+            onFocus={() => setSearchMenu(true)}
+            onBlur={() => setSearchMenu(false)}
           />
         </div>
+        {searchMenu && (
+          <div className="p-2 rounded absolute top-[50px] left-12 shadow-md shadow-gray-700 bg-slate-950 ">
+            {!searchResult ? (
+              <p>No Result Found!</p>
+            ) : (
+              searchResult.map((user) => (
+                <FriendWidget
+                  key={user._id}
+                  {...user}
+                  currentUserFollowing={currentUser.following}
+                  setSuggestedFriends={setSuggestedFriends}
+                  fetchFollowing={fetchFollowing}
+                />
+              ))
+            )}
+          </div>
+        )}
       </div>
 
       <div className="ml-[4%] w-auto flex flex-col gap-4">

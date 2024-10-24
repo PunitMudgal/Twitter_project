@@ -18,9 +18,11 @@ function Home() {
 
   if (isLoading) return <Loading />;
   return (
-    <div className="grid grid-cols-12 h-screen overflow-y-hidden  ">
+    <div className="grid grid-cols-12 h-screen overflow-hidden  ">
       <LeftComp />
-      <Outlet />
+      <div className="relative flex flex-col flex-grow col-span-5 border-x border-purple-700  h-full overflow-y-auto">
+        <Outlet />
+      </div>
       <RightComp />
     </div>
   );

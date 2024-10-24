@@ -7,6 +7,7 @@ const router = express.Router();
 /** FIND */
 router.get("/:id", controller.getUser);
 router.get("/suggestFriends/:userId", Auth, controller.getFriendSuggestions);
+router.get("/search/:name", Auth, controller.searchUser);
 
 /** POST */
 router.post("/getAllFollowing", Auth, controller.getAllFollowing);

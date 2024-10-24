@@ -10,8 +10,10 @@ import { fileURLToPath } from "url";
 import connectDb from "./dbConnection.js";
 import authRoutes from "./router/auth.js";
 import userRoutes from "./router/user.js";
+import postRouter from "./router/post.js";
 import Auth from "./middleware/auth.js";
 import { updateUser } from "./controllers/user.js";
+import { createPost } from "./controllers/post.js";
 
 dotenv.config();
 const app = express();
@@ -45,15 +47,17 @@ app.patch(
   "/user/update",
   Auth,
   upload.fields([
-    { name: "picture", maxCount: 1 }, // Accept one profile photo
-    { name: "backgroundPhoto", maxCount: 1 }, // Accept one background photo
+    { name: "picture", maxCount: 1 }, // Accept profile photo
+    { name: "backgroundPhoto", maxCount: 1 }, // Accept background photo
   ]),
   updateUser
 );
+app.post("/post", Auth, upload.single("picture"), createPost);
 
 // ROUTES
 app.use("/auth", authRoutes);
 app.use("/user", userRoutes);
+app.use("/post", postRouter);
 
 // DATABASE SETUP
 const port = process.env.PORT || 8080;

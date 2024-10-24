@@ -27,7 +27,7 @@ function RegisterProfileCard() {
       formData.append("name", name);
       if (image) {
         formData.append("picture", image);
-        formData.append("profilePicturePath", image?.name);
+        formData.append("profilePicturePath", image.name);
       }
       const updatePromise = updateUser(formData, token);
       toast.promise(updatePromise, {
