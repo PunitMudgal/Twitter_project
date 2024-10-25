@@ -95,7 +95,7 @@ function RightComp() {
   }, [searchText]);
 
   return (
-    <div className="col-span-3 flex flex-col gap-4 sticky top-0 overflow-hidden ">
+    <div className="col-span-3 flex flex-col gap-4 sticky top-0 overflow-hidden md:hidden ">
       {/* search bar (top) */}
       <div className="sticky top-0 w-screen h-12 flex bg-black items-center ">
         <div className=" mx-[4%] flex items-center gap-2  bg-gray-800 p-1 my-1 rounded-3xl ">

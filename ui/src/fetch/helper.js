@@ -173,9 +173,11 @@ export async function createPost(values, token) {
 }
 
 /** */
-export async function getFriendPosts(userId, token) {
+export async function getFriendPosts(userId, token, page) {
   try {
     const { data } = await axios.get(`/post/${userId}/posts`, {
+      params: { page, limit: 4 },
+
       headers: {
         Authorization: `Bearer ${token}`,
       },

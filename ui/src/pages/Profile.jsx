@@ -8,9 +8,10 @@ import toast from "react-hot-toast";
 import message from "../assets/envelope.svg";
 import FetchHook from "../fetch/fetchHook";
 import Loading from "../components/Loading";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { getFriendPosts } from "../fetch/helper";
 import Post from "../components/Post";
+import debounce from "lodash.debounce";
 
 function Profile() {
   const {
@@ -32,34 +33,58 @@ function Profile() {
 
   const { id } = useParams();
   const { isLoading, serverError } = FetchHook(id);
-  let isSelf = LogedInUsername === id;
+  const isSelf = LogedInUsername === id;
   const navigate = useNavigate();
 
   const [friendPosts, setFriendPosts] = useState([]);
   const [postLoading, setPostLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
 
-  const fetchFriendPosts = async () => {
+  const fetchFriendPosts = useCallback(async () => {
+    if (!hasMore) return;
+
     try {
-      const data = await getFriendPosts(_id, token);
-      setFriendPosts(data);
-      setPostLoading(false);
+      setPostLoading(true);
+      const data = await getFriendPosts(_id, token, page);
+
+      if (data.length === 0) {
+        setHasMore(false); // Stop fetching if no data returned
+      } else {
+        setFriendPosts((prevPosts) => [...new Set([...prevPosts, ...data])]); // Avoid duplicate posts
+      }
     } catch (error) {
-      toast.error("Failed to load friend posts", error);
+      toast.error("Failed to load posts");
+    } finally {
       setPostLoading(false);
     }
-  };
+  }, [_id, token, page, hasMore]);
 
   useEffect(() => {
-    if (_id && token) {
-      fetchFriendPosts();
+    if (_id && token) fetchFriendPosts();
+  }, [fetchFriendPosts]);
+
+  // Debounced scroll handler
+  const handleScroll = debounce(() => {
+    if (
+      window.innerHeight + document.documentElement.scrollTop >=
+        document.documentElement.offsetHeight - 200 &&
+      hasMore
+    ) {
+      setPage((prevPage) => prevPage + 1);
     }
-  }, [_id]);
+  }, 300);
+
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [handleScroll]);
 
   if (isLoading) return <Loading />;
   return (
     <>
       {/* header */}
-      <div className="sticky top-0 w-full bg-black bg-opacity5 backdrop-blur-md h-[48px] flex font-style2 self-center text-center text-lg text-gray1 p-1 items-center gap-8">
+      <div className="sticky top-0 w-full bg-transparent bg-opacity-55 backdrop-blur-md h-[48px] flex font-style2 self-center text-center text-lg text-gray1 p-1 items-center gap-8">
         <img
           className="invert h-10 w-auto rotate-180 p-2 hover:bg-gray-950 hover:bg-opacity-15 rounded-full"
           src={backIcon}
@@ -187,16 +212,15 @@ function Profile() {
         </div>
 
         {/* posts */}
-        <div className="flex flex-col m-2 space-y-4 ">
-          {postLoading ? (
+        <div className="flex flex-col m-2  ">
+          {postLoading && page === 1 ? (
             <Loading />
           ) : (
             friendPosts?.map((friendData) => (
-              <>
-                <Post key={friendData._id} {...friendData} />
-              </>
+              <Post key={friendData._id} {...friendData} />
             ))
           )}
+          {postLoading && page > 1 && <Loading />}
         </div>
       </div>
       <Outlet />

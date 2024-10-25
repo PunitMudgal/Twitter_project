@@ -26,7 +26,13 @@ export const createPost = async (req, res) => {
 /** /getAll */
 export async function getFeedPosts(req, res) {
   try {
-    const posts = await Post.find().sort({ createdAt: -1 }).lean();
+    const { page = 1, limit = 4 } = req.qurey;
+
+    const posts = await Post.find()
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(parseInt(limit))
+      .lean();
     res.status(200).json(posts);
   } catch (error) {
     res.status(404).json({ message: error.message });
@@ -37,12 +43,17 @@ export async function getFeedPosts(req, res) {
 export async function getUserPosts(req, res) {
   try {
     const { userId } = req.params;
-    const { page = 1, limit = 4 } = req.query; // Default to page 1, 10 posts per page
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 4;
+
+    console.log(
+      `Fetching posts for user ${userId}: page ${page}, limit ${limit}`
+    );
 
     const posts = await Post.find({ userId })
       .sort({ createdAt: -1 }) // Sort by most recent
       .skip((page - 1) * limit) // Implement pagination
-      .limit(parseInt(limit)) // Limit the number of posts per page
+      .limit(limit) // Limit the number of posts per page
       .lean(); // Optimize performance with lean()
 
     res.status(200).json(posts);

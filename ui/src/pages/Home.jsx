@@ -20,7 +20,7 @@ function Home() {
   return (
     <div className="grid grid-cols-12 h-screen overflow-hidden  ">
       <LeftComp />
-      <div className="relative flex flex-col flex-grow col-span-5 border-x border-purple-700  h-full overflow-y-auto">
+      <div className="relative flex flex-col flex-grow col-span-5 border-x border-purple-700  h-full overflow-y-auto scrollbar-hide md:col-span-9 ">
         <Outlet />
       </div>
       <RightComp />

@@ -52,7 +52,8 @@ function UploadWidget() {
           userId={_id}
         />
         <div className="flex-grow flex flex-col">
-          <input
+          <textarea
+            rows={1}
             value={text}
             onChange={(e) => setText(e.target.value)}
             type="text"
