@@ -8,14 +8,13 @@ import toast from "react-hot-toast";
 import message from "../assets/envelope.svg";
 import FetchHook from "../fetch/fetchHook";
 import Loading from "../components/Loading";
-import { useEffect, useState, useCallback } from "react";
-import { getFriendPosts } from "../fetch/helper";
+import { useEffect, useState } from "react";
 import Post from "../components/Post";
-import debounce from "lodash.debounce";
+import axios from "axios";
+import { useCenterRef } from "../components/CenterRefContext";
 
 function Profile() {
   const {
-    _id,
     name,
     username,
     profilePicturePath,
@@ -35,50 +34,75 @@ function Profile() {
   const { isLoading, serverError } = FetchHook(id);
   const isSelf = LogedInUsername === id;
   const navigate = useNavigate();
+  const centerRef = useCenterRef();
 
   const [friendPosts, setFriendPosts] = useState([]);
   const [postLoading, setPostLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
 
-  const fetchFriendPosts = useCallback(async () => {
-    if (!hasMore) return;
-
+  const fetchFriendPosts = async (page) => {
+    setPostLoading(true);
     try {
-      setPostLoading(true);
-      const data = await getFriendPosts(_id, token, page);
-
-      if (data.length === 0) {
-        setHasMore(false); // Stop fetching if no data returned
+      // const data = await getFriendPosts(id, token, page);
+      const { data } = await axios.get(
+        `/post/${id}/posts?page=${page}&limit=4`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (page === 1) {
+        setFriendPosts(data);
       } else {
-        setFriendPosts((prevPosts) => [...new Set([...prevPosts, ...data])]); // Avoid duplicate posts
+        setFriendPosts((prevPosts) => [...prevPosts, ...data]);
+      }
+
+      if (data.length < 4) {
+        setHasMore(false); // Stop fetching if no data returned
       }
     } catch (error) {
       toast.error("Failed to load posts");
     } finally {
       setPostLoading(false);
     }
-  }, [_id, token, page, hasMore]);
+  };
 
   useEffect(() => {
-    if (_id && token) fetchFriendPosts();
-  }, [fetchFriendPosts]);
+    fetchFriendPosts(page);
+  }, [page]);
 
-  // Debounced scroll handler
-  const handleScroll = debounce(() => {
-    if (
-      window.innerHeight + document.documentElement.scrollTop >=
-        document.documentElement.offsetHeight - 200 &&
-      hasMore
-    ) {
-      setPage((prevPage) => prevPage + 1);
+  useEffect(() => {
+    setFriendPosts([]);
+    setPage(1);
+    setHasMore(true);
+  }, [id]);
+
+  useEffect(() => {
+    const centerElement = centerRef?.current;
+    if (!centerElement) {
+      console.log("centerRef.current is null");
     }
-  }, 300);
 
-  useEffect(() => {
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [handleScroll]);
+    const handleScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = centerElement;
+      console.log("scroll of center component called");
+      if (
+        scrollTop + clientHeight >= scrollHeight - 5 &&
+        hasMore &&
+        !postLoading
+      ) {
+        setPage((prevPage) => prevPage + 1);
+      }
+    };
+
+    centerElement?.addEventListener("scroll", handleScroll);
+
+    return () => {
+      centerElement?.removeEventListener("scroll", handleScroll);
+    };
+  }, [postLoading, hasMore]);
 
   if (isLoading) return <Loading />;
   return (
@@ -178,7 +202,7 @@ function Profile() {
             <p>
               {following?.length}{" "}
               <Link
-                to={`/home/${_id}/follower&following`}
+                to={`/home/${id}/follower&following`}
                 className="text-gray2 hover:underline"
               >
                 Following
@@ -187,7 +211,7 @@ function Profile() {
             <p>
               {follower?.length}{" "}
               <Link
-                to={`/home/${_id}/follower&following`}
+                to={`/home/${id}/follower&following`}
                 className="text-gray2 hover:underline"
               >
                 Follower
@@ -222,6 +246,14 @@ function Profile() {
           )}
           {postLoading && page > 1 && <Loading />}
         </div>
+        {hasMore && (
+          <p
+            onClick={() => setPage((prevPage) => prevPage + 1)}
+            className="text-green-400 h-10 mb-1 p-1 w-full border-y text-center border-gray-500 font-style2 cursor-pointer"
+          >
+            Load More...
+          </p>
+        )}
       </div>
       <Outlet />
     </>

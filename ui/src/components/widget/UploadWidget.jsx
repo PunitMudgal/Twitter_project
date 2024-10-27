@@ -12,11 +12,13 @@ import { GrEmoji } from "react-icons/gr";
 import { useSelector } from "react-redux";
 import { createPost } from "../../fetch/helper";
 import toast from "react-hot-toast";
+import { selectUser } from "../../store/authSlice";
 
 function UploadWidget() {
-  const { profilePicturePath, _id } = useSelector(
-    (state) => state.auth?.user || {}
-  );
+  const user = useSelector(selectUser);
+
+  const { name, isAdmin, username, _id, profilePicturePath } = user;
+
   const token = useSelector((state) => state.auth?.token);
   const [text, setText] = useState("");
   const [photo, setPhoto] = useState(null);

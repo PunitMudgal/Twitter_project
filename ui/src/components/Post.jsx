@@ -9,27 +9,39 @@ import { GoBookmark } from "react-icons/go";
 import { RiShare2Line, RiDeleteBin6Line } from "react-icons/ri";
 import { SlOptions } from "react-icons/sl";
 import { useSelector } from "react-redux";
+import { likeUnlikePost } from "../fetch/helper";
 
 function Post({
+  _id,
   userId,
   picturePath,
   name,
   username,
   profilePicturePath,
-  likes,
+  likes: initialLikes,
   comments,
   createdAt,
   text,
 }) {
   const [menu, setMenu] = useState(false);
+  const [likes, setLikes] = useState(initialLikes);
+
   const currentUserId = useSelector((state) => state.auth?.user?._id);
   let isSelf = currentUserId === userId;
+  const token = localStorage.getItem("token");
+
+  const isLiked = Boolean(likes[currentUserId]);
+
+  const likeUnlikeHandle = async () => {
+    const { post } = await likeUnlikePost(_id, currentUserId, token);
+    setLikes(post.likes);
+  };
 
   return (
-    <div className="flex items-start p-2 gap-2 border-b border-gray-600 w-full ">
+    <div className="flex items-start p-2 gap-2 border-t border-gray-600 w-full ">
       <Avatar profilePhoto={profilePicturePath} userId={userId} />
 
-      <div className="flex flex-col gap-1 w-full">
+      <div className="flex flex-col gap-1 w-full justify-start">
         <div className="relative mt-1 flex gap-2 text-sm place-item-center ">
           <p className=" font-semibold text-white">{name}</p>
           <p className=" text-gray-400  ">@{username}</p>
@@ -53,7 +65,7 @@ function Post({
         {picturePath && (
           <img
             src={`http://localhost:1414/assets/${picturePath}`}
-            className="rounded-2xl "
+            className="self-start rounded-2xl object-cover max-h-[520px] w-auto"
             alt="post"
           />
         )}
@@ -66,9 +78,16 @@ function Post({
             <BiRepost className="text-2xl text-gray-500" />
             20
           </span>
-          <span className="flex items-center gap-1 text-gray-400">
-            <GoHeart className="text-xl text-gray-500" />
-            76
+          <span
+            onClick={likeUnlikeHandle}
+            className="flex items-center gap-1 text-gray-400 cursor-pointer"
+          >
+            {isLiked ? (
+              <FcLike className="text-xl text-gray-500" />
+            ) : (
+              <GoHeart className="text-xl text-gray-500" />
+            )}
+            {Object.keys(likes).length}
           </span>
           <span className="flex items-center gap-1 text-gray-400">
             <MdBarChart className="text-xl text-gray-500" />

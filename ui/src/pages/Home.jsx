@@ -4,10 +4,13 @@ import { useSelector } from "react-redux";
 import { Outlet } from "react-router-dom";
 import useFetchHook from "../fetch/fetchHook";
 import Loading from "../components/Loading";
+import { useRef } from "react";
+import { CenterRefProvider } from "../components/CenterRefContext";
 
 function Home() {
   const { isLoading, serverError } = useFetchHook();
   const user = useSelector((state) => state.auth.user);
+  const centerRef = useRef(null); // for controlling center scrolling
 
   if (serverError)
     return (
@@ -20,8 +23,13 @@ function Home() {
   return (
     <div className="grid grid-cols-12 h-screen overflow-hidden  ">
       <LeftComp />
-      <div className="relative flex flex-col flex-grow col-span-5 border-x border-purple-700  h-full overflow-y-auto scrollbar-hide md:col-span-9 ">
-        <Outlet />
+      <div
+        ref={centerRef}
+        className="relative flex flex-col flex-grow col-span-5 border-x border-purple-700 h-full overflow-y-auto lg:col-span-7 "
+      >
+        <CenterRefProvider centerRef={centerRef}>
+          <Outlet />
+        </CenterRefProvider>
       </div>
       <RightComp />
     </div>

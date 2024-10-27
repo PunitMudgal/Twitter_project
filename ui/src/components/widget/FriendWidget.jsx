@@ -31,14 +31,14 @@ function FriendWidget({
         success: "Followed successfully",
         error: (err) => err.response?.data?.message,
       });
-      setSuggestedFriends((prev) =>
-        prev.map((friend) =>
-          friend._id === friendId
-            ? { ...friend, _id, profilePicturePath, name, username, isAdmin }
-            : friend
-        )
-      );
-      await fetchFollowing();
+      // setSuggestedFriends((prev) =>
+      //   prev.map((friend) =>
+      //     friend._id === friendId
+      //       ? { ...friend, _id, profilePicturePath, name, username, isAdmin }
+      //       : friend
+      //   )
+      // );
+      fetchFollowing();
     } catch (error) {
       toast.error(error.response?.data?.message);
     }
@@ -56,11 +56,12 @@ function FriendWidget({
         success: "Unfollowed successfully",
         error: (err) => err.response?.data?.message,
       });
-      setSuggestedFriends((prev) =>
-        prev.map((friend) =>
-          friend._id === friendId ? { ...friend, isFollowing: false } : friend
-        )
-      );
+      // setSuggestedFriends((prev) =>
+      //   prev.map((friend) =>
+      //     friend._id === friendId ? { ...friend, isFollowing: false } : friend
+      //   )
+      // );
+      fetchFollowing();
     } catch (error) {
       toast.error(error.response?.data?.message);
     }

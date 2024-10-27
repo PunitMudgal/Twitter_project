@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSelector, createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   user: null,
@@ -8,6 +8,11 @@ const initialState = {
   searchResult: [],
   token: localStorage.getItem("token") || null,
 };
+
+export const selectUser = createSelector(
+  (state) => state.auth.user,
+  (user) => user || {} // Provide an empty object if user is null or undefined
+);
 
 export const authSlice = createSlice({
   name: "auth",

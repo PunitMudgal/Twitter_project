@@ -8,6 +8,6 @@ router.get("/getAll", controller.getFeedPosts);
 router.get("/:userId/posts", Auth, controller.getUserPosts);
 
 /**UPDATE */
-// router.patch("/:id/like", Auth, likePost);
+router.patch("/:postId/like", Auth, controller.likePost);
 
 export default router;

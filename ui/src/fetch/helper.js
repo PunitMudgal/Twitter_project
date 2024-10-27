@@ -187,3 +187,29 @@ export async function getFriendPosts(userId, token, page) {
     throw new Error("Error while fetching user post");
   }
 }
+
+export async function getFeedPosts(page) {
+  try {
+    const { data } = await axios.get(`/post/getAll?page=${page}&limit=5`);
+    return data;
+  } catch (error) {
+    throw new Error("Error while fetching feed post");
+  }
+}
+
+export async function likeUnlikePost(postId, userId, token) {
+  try {
+    const { data } = await axios.patch(
+      `/post/${postId}/like`,
+      { userId },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return data;
+  } catch (error) {
+    throw new Error("Error while liking post");
+  }
+}

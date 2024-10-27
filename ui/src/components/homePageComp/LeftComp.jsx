@@ -12,10 +12,10 @@ import notificationIcon from "../../assets/bell.svg";
 import businessIcon from "../../assets/lightning.svg";
 import communitiesIcon from "../../assets/communities.svg";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { setToken, truncateUsername } from "../../store/authSlice";
+import { selectUser, setToken, truncateUsername } from "../../store/authSlice";
 
 function LeftComp() {
   const [menu, setMenu] = useState(false);
@@ -23,9 +23,8 @@ function LeftComp() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { name, isAdmin, username, _id, profilePicturePath } = useSelector(
-    (state) => state.auth?.user || {}
-  );
+  const user = useSelector(selectUser);
+  const { name, isAdmin, username, _id, profilePicturePath } = user;
 
   const Icons = [
     { name: "home", icon: homeIcon },

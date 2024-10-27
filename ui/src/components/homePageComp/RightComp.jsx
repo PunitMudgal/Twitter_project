@@ -1,11 +1,12 @@
+import { toast } from "react-hot-toast";
+import { useEffect, useState } from "react";
+import { RiRefreshLine } from "react-icons/ri";
 import { useDispatch, useSelector } from "react-redux";
 
-import Avatar from "../Avatar";
 import tick from "../../assets/tick.png";
 import chatIcon from "../../assets/chat.svg";
 import searchIcon from "../../assets/search.svg";
-import { setSearchResult, truncateUsername } from "../../store/authSlice";
-import { useEffect, useState } from "react";
+import Avatar from "../Avatar";
 import {
   follow,
   getAllFollowing,
@@ -14,10 +15,9 @@ import {
   unfollow,
 } from "../../fetch/helper";
 import Loading from "../Loading";
-import { toast } from "react-hot-toast";
-import { RiRefreshLine } from "react-icons/ri";
 import "../../style/profile.css";
 import FriendWidget from "../widget/FriendWidget";
+import { setSearchResult, truncateUsername } from "../../store/authSlice";
 
 function RightComp() {
   const dispatch = useDispatch();
@@ -63,7 +63,7 @@ function RightComp() {
   const fetchFollowing = async () => {
     try {
       const data = await getAllFollowing(currentUser?.following, token);
-      if (data) dispatch(setFollowings(data));
+      setFollowings(data);
     } catch (error) {
       console.error("Error fetching friends:", error);
     }
@@ -95,7 +95,7 @@ function RightComp() {
   }, [searchText]);
 
   return (
-    <div className="col-span-3 flex flex-col gap-4 sticky top-0 overflow-hidden md:hidden ">
+    <div className="col-span-3 flex flex-col gap-4 sticky top-0 overflow-hidden lg:hidden ">
       {/* search bar (top) */}
       <div className="sticky top-0 w-screen h-12 flex bg-black items-center ">
         <div className=" mx-[4%] flex items-center gap-2  bg-gray-800 p-1 my-1 rounded-3xl ">
