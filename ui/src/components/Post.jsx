@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Avatar from "./Avatar";
 import { GoHeart } from "react-icons/go";
 import { FcLike } from "react-icons/fc";
@@ -10,6 +10,9 @@ import { RiShare2Line, RiDeleteBin6Line } from "react-icons/ri";
 import { SlOptions } from "react-icons/sl";
 import { useSelector } from "react-redux";
 import { likeUnlikePost } from "../fetch/helper";
+import "../style/profile.css";
+import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 function Post({
   _id,
@@ -29,7 +32,7 @@ function Post({
   const currentUserId = useSelector((state) => state.auth?.user?._id);
   let isSelf = currentUserId === userId;
   const token = localStorage.getItem("token");
-
+  const navigate = useNavigate();
   const isLiked = Boolean(likes[currentUserId]);
 
   const likeUnlikeHandle = async () => {
@@ -64,8 +67,9 @@ function Post({
         <p className="mb-1 font-style3  ">{text}</p>
         {picturePath && (
           <img
+            onClick={() => navigate(`/${_id}/photo/${picturePath}`)}
             src={`http://localhost:1414/assets/${picturePath}`}
-            className="self-start rounded-2xl object-cover max-h-[520px] w-auto"
+            className="self-start rounded-2xl object-cover max-h-[520px] w-auto cursor-pointer"
             alt="post"
           />
         )}
@@ -78,7 +82,9 @@ function Post({
             <BiRepost className="text-2xl text-gray-500" />
             20
           </span>
-          <span
+          <motion.span
+            animate={{ scale: isLiked ? [1, 1.3, 1] : 1 }}
+            transition={{ duration: 0.3 }}
             onClick={likeUnlikeHandle}
             className="flex items-center gap-1 text-gray-400 cursor-pointer"
           >
@@ -88,7 +94,7 @@ function Post({
               <GoHeart className="text-xl text-gray-500" />
             )}
             {Object.keys(likes).length}
-          </span>
+          </motion.span>
           <span className="flex items-center gap-1 text-gray-400">
             <MdBarChart className="text-xl text-gray-500" />
             114

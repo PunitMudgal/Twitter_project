@@ -17,7 +17,7 @@ import { selectUser } from "../../store/authSlice";
 function UploadWidget() {
   const user = useSelector(selectUser);
 
-  const { name, isAdmin, username, _id, profilePicturePath } = user;
+  const { _id, profilePicturePath } = user;
 
   const token = useSelector((state) => state.auth?.token);
   const [text, setText] = useState("");
@@ -80,7 +80,7 @@ function UploadWidget() {
 
       <div className="flex justify-between gap-5 pl-[3.4rem] pt-3  text-violet-400">
         <div className="flex gap-3 text-xl cursor-pointer">
-          <label htmlFor="photo">
+          <label htmlFor="photo" className="cursor-pointer">
             <IoImageOutline />
           </label>
           <input
@@ -92,7 +92,7 @@ function UploadWidget() {
               setPrevPhoto(URL.createObjectURL(e.target.files[0]));
             }}
           />
-          <MdGif />
+          <MdGif className="border rounded-md border-gray-400" />
           <CgOptions />
           <GrEmoji />
           <IoCalendarOutline />

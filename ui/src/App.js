@@ -72,7 +72,7 @@ function App() {
       ],
     },
     {
-      path: "/:userId/photo",
+      path: "/:userId/photo/:picturePath",
       element: (
         <ProtectRoutes>
           <ViewPhoto />

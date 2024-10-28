@@ -5,7 +5,6 @@ import "../../style/profile.css";
 import "../../index.css";
 import CenterHeader from "../CenterHeader";
 import { getFeedPosts } from "../../fetch/helper";
-import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import Post from "../Post";
 import { useCenterRef } from "../CenterRefContext";
@@ -51,7 +50,6 @@ function CenterComp({ isLoading }) {
 
     const handleScroll = () => {
       const { scrollTop, scrollHeight, clientHeight } = centerElement;
-      console.log("scroll of center component called");
       if (
         scrollTop + clientHeight >= scrollHeight - 5 &&
         hasMore &&

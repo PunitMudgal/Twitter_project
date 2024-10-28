@@ -1,16 +1,17 @@
+import axios from "axios";
+import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
-import backIcon from "../assets/next.svg";
+import { useEffect, useState } from "react";
+import { IoCalendarOutline, IoLocationOutline } from "react-icons/io5";
 import { Outlet, useNavigate, useParams, Link } from "react-router-dom";
+
+import backIcon from "../assets/next.svg";
 import tick from "../assets/tick.png";
 import defaultPhoto from "../assets/profile.png";
-import { IoCalendarOutline, IoLocationOutline } from "react-icons/io5";
-import toast from "react-hot-toast";
 import message from "../assets/envelope.svg";
 import FetchHook from "../fetch/fetchHook";
 import Loading from "../components/Loading";
-import { useEffect, useState } from "react";
 import Post from "../components/Post";
-import axios from "axios";
 import { useCenterRef } from "../components/CenterRefContext";
 
 function Profile() {
@@ -142,7 +143,9 @@ function Profile() {
 
         {/* Profile Photo */}
         <img
-          onClick={() => navigate(profilePicturePath && `/${id}/photo`)}
+          onClick={() =>
+            navigate(profilePicturePath && `/${id}/photo/${profilePicturePath}`)
+          }
           className="absolute top-[16%] left-4 h-36 w-36  object-cover border-4 border-gray-900 rounded-full transition-transform duration-300 ease-in-out transform hover:scale-105 hover:border-2 cursor-pointer"
           src={
             profilePicturePath

@@ -1,4 +1,4 @@
-import { toast } from "react-hot-toast";
+import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { RiRefreshLine } from "react-icons/ri";
 import { useDispatch, useSelector } from "react-redux";
@@ -8,11 +8,9 @@ import chatIcon from "../../assets/chat.svg";
 import searchIcon from "../../assets/search.svg";
 import Avatar from "../Avatar";
 import {
-  follow,
   getAllFollowing,
   getFriendSuggestion,
   searchUser,
-  unfollow,
 } from "../../fetch/helper";
 import Loading from "../Loading";
 import "../../style/profile.css";
@@ -94,6 +92,20 @@ function RightComp() {
     }
   }, [searchText]);
 
+  /** for popup animations in friends and suggestion list*/
+  const containerVariants = {
+    visible: {
+      transition: {
+        staggerChildren: 0.2, // delay between each item animation
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 },
+  };
+
   return (
     <div className="col-span-3 flex flex-col gap-4 sticky top-0 overflow-hidden lg:hidden ">
       {/* search bar (top) */}
@@ -153,31 +165,50 @@ function RightComp() {
           {suggestionLoading ? (
             <Loading />
           ) : (
-            <>
+            <motion.div
+              className="friends-list-container"
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+            >
               {suggestedFriends.map((friend) => (
-                <div key={friend._id}>
+                <motion.div
+                  key={friend._id}
+                  variants={itemVariants}
+                  whileHover={{ scale: 1.05 }} // Optional: scale up on hover
+                  transition={{ type: "spring", stiffness: 120 }}
+                >
                   <FriendWidget
                     {...friend}
                     currentUserFollowing={currentUser.following}
                     setSuggestedFriends={setSuggestedFriends}
                     fetchFollowing={fetchFollowing}
                   />
-                </div>
+                </motion.div>
               ))}
-            </>
+            </motion.div>
           )}
         </div>
 
         {/* friends column */}
-        <div className=" border border-purple-700 p-2 rounded-md">
+        <motion.div
+          className=" border border-purple-700 p-2 rounded-md"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
           <p className="font-semibold mb-2 text-lg">
             Your Friends{" "}
             <span className="text-sm ">({followings?.length})</span>{" "}
           </p>
+
           {followings?.slice(0, 4).map((friend) => (
-            <div
+            <motion.div
               key={friend?._id}
               className="flex gap-2 items-center p-2 text-sm font-semibold rounded-3xl hover:bg-purple-500 hover:bg-opacity-20 "
+              variants={itemVariants}
+              whileHover={{ scale: 1.05 }} // Optional: scale up on hover
+              transition={{ type: "spring", stiffness: 120 }}
             >
               <Avatar
                 profilePhoto={friend?.profilePicturePath}
@@ -199,9 +230,9 @@ function RightComp() {
                 src={chatIcon}
                 alt="icon"
               />
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
         {/* exrta column */}
         <div className="border border-purple-700 p-2 rounded-md">

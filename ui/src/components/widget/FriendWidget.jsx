@@ -5,6 +5,7 @@ import Avatar from "../Avatar";
 import toast from "react-hot-toast";
 import { follow, unfollow } from "../../fetch/helper";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 function FriendWidget({
   _id,
@@ -18,6 +19,7 @@ function FriendWidget({
 }) {
   const token = useSelector((state) => state.auth?.token);
   const currentUser = useSelector((state) => state.auth?.user);
+  const navigate = useNavigate();
 
   // Follow
   const handleFollowUser = async (friendId) => {
@@ -70,7 +72,10 @@ function FriendWidget({
   return (
     <div className="flex gap-2 items-center p-2 text-sm font-semibold rounded-3xl hover:bg-purple-500 hover:bg-opacity-20 ">
       <Avatar profilePhoto={profilePicturePath} userId={_id} />
-      <div className="flex flex-col">
+      <div
+        onClick={() => navigate(`/home/${_id}`)}
+        className="flex flex-col cursor-pointer"
+      >
         <p className="flex gap-1 items-center capitalize">
           {truncateUsername(name)}
           {isAdmin && <img src={tick} className="h-4 w-4" alt="purpletick" />}

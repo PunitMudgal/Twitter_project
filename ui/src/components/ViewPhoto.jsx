@@ -4,9 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { RxCross1 } from "react-icons/rx";
 
 function ViewPhoto() {
-  const { id } = useParams();
-  const { profilePicturePath } =
-    useSelector((state) => state.auth.friendProfile) || {};
+  const { picturePath } = useParams();
   const navigate = useNavigate();
 
   return (
@@ -17,7 +15,7 @@ function ViewPhoto() {
       />
       <img
         className="object-cover m-4 h-[85%] md:h-auto md:w-[90%] rounded-md  "
-        src={`http://localhost:1414/assets/${profilePicturePath}`}
+        src={`http://localhost:1414/assets/${picturePath}`}
         alt="profile photo"
       />
     </div>
