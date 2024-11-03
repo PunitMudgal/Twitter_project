@@ -108,9 +108,9 @@ export const updateUser = async (req, res) => {
 
 export const getFriendSuggestions = async (req, res) => {
   try {
-    // const userId = req.user.userId;
-    const userId = req.params.userId;
-    const currentUser = await User.findById(userId).select("following");
+    const { userId } = req.user;
+    console.log(req.user);
+    const currentUser = await User.findById(userId).select("following").lean();
 
     const followingList = currentUser.following || [];
 
@@ -139,9 +139,9 @@ export const getFriendSuggestions = async (req, res) => {
 export const getAllFollowing = async (req, res) => {
   const { following } = req.body;
   try {
-    const followings = await User.find({ _id: { $in: following } }).select(
-      "name username profilePicturePath isAdmin _id"
-    );
+    const followings = await User.find({ _id: { $in: following } })
+      .select("name username profilePicturePath isAdmin _id")
+      .lean();
     res.status(200).json(followings);
   } catch (error) {
     res.status(500).json({ message: "Failed to fetch friends data", error });
@@ -152,34 +152,39 @@ export const getAllFollowing = async (req, res) => {
 export const getAllFollower = async (req, res) => {
   const { follower } = req.body;
   try {
-    const followers = await User.find({ _id: { $in: follower } }).select(
-      "name username profilePicturePath isAdmin _id"
-    );
+    const followers = await User.find({ _id: { $in: follower } })
+      .select("name username profilePicturePath isAdmin _id")
+      .lean();
     res.status(200).json(followers);
   } catch (error) {
     res.status(500).json({ message: "Failed to fetch friends data", error });
   }
 };
 
-export const deleteAllUsers = async (req, res) => {
-  try {
-    await User.deleteMany({}); // Pass an empty filter to delete all documents
-    return res.status(201).send({ msg: "Data deleted!" });
-  } catch (error) {
-    return res.status(500).send({ error: "Something went wrong" });
-  }
-};
-
-// delete -> /deleteUser/:id
+// delete -> /deleteUser/:userId
 export const deleteUser = async (req, res) => {
-  if (req.body.userId === req.params.id || req.body.isAdmin) {
+  const { userId } = req.params;
+  const { userId: loggedInUserId, isAdmin } = req.user;
+  if (userId === loggedInUserId || isAdmin) {
     try {
-      await User.findByIdAndDelete(req.params.id);
+      await User.findByIdAndDelete(userId);
       res.status(200).json("Account deleted successfully");
     } catch (err) {
       return res.status(500).json(err);
     }
   } else {
     return res.status(403).json("You can only delete your account!");
+  }
+};
+
+export const getAllUsers = async (req, res) => {
+  const { userId } = req.user;
+  try {
+    const users = await User.find({ _id: { $ne: userId } })
+      .select("name username profilePicturePath isAdmin _id")
+      .lean();
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch users data", error });
   }
 };

@@ -4,9 +4,9 @@ function CenterHeader({ button1, button2, activeTab, setActiveTab }) {
   return (
     <div className="sticky w-full min-h-[48px] top-0 flex font-style2 self-center text-center text-lg text-gray1 border-b border-purple-950 backdrop-blur-md z-20 ">
       <button
-        onClick={() => setActiveTab("follower")}
+        onClick={() => setActiveTab("For You")}
         className={`${
-          activeTab === "follower"
+          activeTab === "For You"
             ? "text-white underline underline-offset-8  "
             : ""
         } flex-1 hover:bg-violet-600 hover:bg-opacity-20`}
@@ -14,9 +14,9 @@ function CenterHeader({ button1, button2, activeTab, setActiveTab }) {
         {button1}
       </button>
       <button
-        onClick={() => setActiveTab("following")}
+        onClick={() => setActiveTab("Following")}
         className={`${
-          activeTab === "following"
+          activeTab === "Following"
             ? "text-white underline underline-offset-8 "
             : ""
         } flex-1 hover:bg-violet-600 hover:bg-opacity-20`}

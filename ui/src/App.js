@@ -2,7 +2,6 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Suspense, lazy } from "react";
 import ProtectRoutes from "./helper/ProtectRoutes";
 import { Toaster } from "react-hot-toast";
-import Loading from "./components/Loading";
 import { AppLayoutAuthentication, AppLayoutRegister } from "./pages/AppLayout";
 import CenterComp from "./components/homePageComp/CenterComp";
 import Logo from "./assets/blue.png";
@@ -13,6 +12,7 @@ const RegisterProfileCard = lazy(() =>
   import("./authentication/RegisterProfileCard")
 );
 const Profile = lazy(() => import("./pages/Profile"));
+const AdminPage = lazy(() => import("./pages/AdminPage"));
 const ViewPhoto = lazy(() => import("./components/ViewPhoto"));
 const EditProfileInfoWidget = lazy(() =>
   import("./components/widget/EditProfileInfoWidget")
@@ -20,6 +20,7 @@ const EditProfileInfoWidget = lazy(() =>
 const FollowerAndFollowing = lazy(() =>
   import("./components/widget/FollowerAndFollowing")
 );
+const ErrorPage = lazy(() => import("./pages/Error404"));
 
 function App() {
   const router = createBrowserRouter([
@@ -63,6 +64,10 @@ function App() {
               path: "edit",
               element: <EditProfileInfoWidget />,
             },
+            {
+              path: "admin/dashboard",
+              element: <AdminPage />,
+            },
           ],
         },
         {
@@ -79,6 +84,8 @@ function App() {
         </ProtectRoutes>
       ),
     },
+
+    { path: "*", element: <ErrorPage /> },
   ]);
 
   return (
@@ -86,7 +93,7 @@ function App() {
       <Suspense
         fallback={
           <div className="flex justify-center items-center h-screen w-full bg-transparent flex-col">
-            <img src={Logo} className="h-40 w-auto" alt="logo" />
+            <img src={Logo} className="h-32 w-auto" alt="logo" />
             <p className="font-bold font-style2 text-xl">FOREVER</p>
           </div>
         }

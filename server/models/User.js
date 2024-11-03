@@ -41,6 +41,10 @@ const UserScheme = new mongoose.Schema(
       type: String,
       default: "",
     },
+    bookmark: {
+      type: Array,
+      default: [],
+    },
     isAdmin: {
       type: Boolean,
       default: false,

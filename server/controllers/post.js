@@ -3,17 +3,23 @@ import User from "../models/User.js";
 
 export const createPost = async (req, res) => {
   try {
-    const { userId, text, picturePath } = req.body;
-    const user = await User.findById(userId);
+    const { userId, text, picturePath, isQuote, parentId } = req.body;
+    const user = await User.findById(userId).select(
+      "name username profilePicturePath isAdmin"
+    );
     const newPost = new Post({
       userId,
       name: user.name,
       username: user.username,
       profilePicturePath: user.profilePicturePath,
+      isAdmin: user.isAdmin,
       picturePath: picturePath || "",
       text: text || "",
       likes: {},
       comments: [],
+      rootPostId: parentId || null,
+      parentId: parentId || null,
+      isQuote: isQuote || false,
     });
     await newPost.save();
     const post = await Post.find();
@@ -27,7 +33,7 @@ export const createPost = async (req, res) => {
 export async function getFeedPosts(req, res) {
   try {
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 4;
+    const limit = parseInt(req.query.limit) || 5;
 
     const startIndex = (page - 1) * limit;
 
@@ -43,6 +49,42 @@ export async function getFeedPosts(req, res) {
     res.status(200).json({ posts, hasMore });
   } catch (error) {
     res.status(404).json({ message: error.message });
+  }
+}
+
+export async function getFollowingPosts(req, res) {
+  try {
+    const { userId } = req.params;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+    const skip = (page - 1) * limit;
+
+    // Fetch user following list
+    const user = await User.findById(userId).select("following").lean();
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const posts = await Post.find({
+      $or: [
+        { userId: { $in: user.following } }, // posts from followed users
+        { userId: userId }, // user's own posts
+      ],
+    })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean();
+
+    // Count total posts from following list and self
+    const totalPosts = await Post.countDocuments({
+      $or: [{ userId: { $in: user.following } }, { userId: userId }],
+    });
+    const hasMore = skip + posts.length < totalPosts;
+
+    res.status(200).json({ posts, hasMore });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 }
 
@@ -83,6 +125,58 @@ export async function likePost(req, res) {
       .json({ message: isLiked ? "Post unliked" : "Post liked", post });
   } catch (error) {
     console.error("Error liking/unliking post:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+}
+
+export async function bookmarkPost(req, res) {
+  const { postId } = req.params;
+  const { userId } = req.body;
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const isSaved = user.bookmark.includes(postId);
+
+    if (isSaved) {
+      user.bookmark = user.bookmark.filter((id) => id !== postId);
+    } else {
+      user.bookmark.push(postId);
+    }
+    await user.save();
+    res.status(200).json({ message: isSaved ? "Post Removed" : "Post Saved" });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+}
+
+export async function deletePost(req, res) {
+  const { postId } = req.params;
+  const { userId } = req.body;
+
+  try {
+    // Validate if the post exists
+    const post = await Post.findById(postId);
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+
+    if (post.userId === userId) {
+      await post.deleteOne();
+      return res.status(200).json({ message: "Post deleted" });
+    }
+
+    const user = await User.findById(userId);
+    if (user && user.isAdmin) {
+      await post.deleteOne();
+      return res.status(200).json({ message: "Post deleted" });
+    }
+
+    res.status(403).json({ message: "Unauthorized" });
+  } catch (error) {
     res.status(500).json({ message: "Server error" });
   }
 }

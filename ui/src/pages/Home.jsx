@@ -9,7 +9,6 @@ import { CenterRefProvider } from "../components/CenterRefContext";
 
 function Home() {
   const { isLoading, serverError } = useFetchHook();
-  const user = useSelector((state) => state.auth.user);
   const centerRef = useRef(null); // for controlling center scrolling
 
   if (serverError)
@@ -21,11 +20,11 @@ function Home() {
 
   if (isLoading) return <Loading />;
   return (
-    <div className="grid grid-cols-12 h-screen overflow-hidden  ">
+    <div className="grid grid-cols-12 h-screen overflow-hidden lg:flex  ">
       <LeftComp />
       <div
         ref={centerRef}
-        className="relative flex flex-col flex-grow col-span-5 border-x border-purple-700 h-full overflow-y-auto lg:col-span-7 "
+        className="flex flex-col flex-grow col-span-5 border-x border-purple-700 h-full overflow-y-auto lg:col-span-7 "
       >
         <CenterRefProvider centerRef={centerRef}>
           <Outlet />

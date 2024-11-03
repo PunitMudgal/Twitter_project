@@ -1,52 +1,52 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import UploadWidget from "../widget/UploadWidget";
 import Loading from "../Loading";
 import "../../style/profile.css";
 import "../../index.css";
 import CenterHeader from "../CenterHeader";
-import { getFeedPosts } from "../../fetch/helper";
+import { getFeedPosts, getFollowingPosts } from "../../fetch/helper";
 import toast from "react-hot-toast";
 import Post from "../Post";
 import { useCenterRef } from "../CenterRefContext";
+import { useSelector } from "react-redux";
 
 function CenterComp({ isLoading }) {
-  const [feedPosts, setFeedPosts] = useState([]);
+  const [posts, setPosts] = useState([]);
+  const [activeTab, setActiveTab] = useState("For You");
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [postLoading, setPostLoading] = useState(true);
 
   const centerRef = useCenterRef();
+  const loggedInUserId = useSelector((state) => state.auth?.user?._id);
+  const token = localStorage.getItem("token");
 
-  const fetchFeedPosts = async () => {
+  const fetchPosts = useCallback(async () => {
     setPostLoading(true);
     try {
-      const { posts, hasMore } = await getFeedPosts(page);
-      if (page === 1) {
-        setFeedPosts(posts);
-        setHasMore(hasMore);
-      } else {
-        setFeedPosts((prevPosts) => [...prevPosts, ...posts]);
-        setHasMore(hasMore);
-      }
-      if (posts.length < 4) {
-        setHasMore(false);
-      }
-    } catch (error) {
+      const fetchMethod =
+        activeTab === "For You" ? getFeedPosts : getFollowingPosts;
+      const { posts: newPosts, hasMore: morePostsAvailable } =
+        await fetchMethod(page, loggedInUserId, token);
+
+      setPosts((prevPosts) =>
+        page === 1 ? newPosts : [...prevPosts, ...newPosts]
+      );
+      setHasMore(newPosts.length >= 4 && morePostsAvailable);
+    } catch {
       toast.error("Failed to load posts");
     } finally {
       setPostLoading(false);
     }
-  };
+  }, [activeTab, page, loggedInUserId, token]);
 
   useEffect(() => {
-    fetchFeedPosts(page);
-  }, [page]);
+    fetchPosts();
+  }, [activeTab, page]);
 
   useEffect(() => {
     const centerElement = centerRef.current;
-    if (!centerElement) {
-      console.log("centerRef.current is null");
-    }
+    if (!centerElement) return;
 
     const handleScroll = () => {
       const { scrollTop, scrollHeight, clientHeight } = centerElement;
@@ -59,25 +59,31 @@ function CenterComp({ isLoading }) {
       }
     };
 
-    centerElement?.addEventListener("scroll", handleScroll);
-
-    return () => {
-      centerElement?.removeEventListener("scroll", handleScroll);
-    };
-  }, [postLoading, hasMore]);
+    const debouncedScroll = debounce(handleScroll, 200);
+    centerElement.addEventListener("scroll", debouncedScroll);
+    return () => centerElement.removeEventListener("scroll", debouncedScroll);
+  }, [postLoading, hasMore, centerRef]);
 
   return (
     <>
       {/* header */}
-      <CenterHeader button1="For You" button2="Following" />
-      <UploadWidget />
-      {isLoading ? <Loading /> : ""}
+      <CenterHeader
+        button1="For You"
+        button2="Following"
+        setActiveTab={setActiveTab}
+        activeTab={activeTab}
+      />
 
-      <div className="flex flex-col m-2 space-y-4 ">
+      <UploadWidget />
+
+      {isLoading && <Loading />}
+      <div className="flex flex-col space-y-4">
         {postLoading ? (
           <Loading />
         ) : (
-          feedPosts?.map((post) => <Post key={post._id} {...post} />)
+          posts.map((post) => (
+            <Post key={post._id} {...post} posts={posts} setPosts={setPosts} />
+          ))
         )}
       </div>
     </>
@@ -85,3 +91,12 @@ function CenterComp({ isLoading }) {
 }
 
 export default CenterComp;
+
+// Utility function for debounce
+function debounce(func, delay) {
+  let timeout;
+  return function (...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func(...args), delay);
+  };
+}

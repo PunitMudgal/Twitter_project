@@ -1,18 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Avatar from "./Avatar";
-import { GoHeart } from "react-icons/go";
 import { FcLike } from "react-icons/fc";
-import { BiRepost } from "react-icons/bi";
-import { BiComment, BiEditAlt } from "react-icons/bi";
-import { MdBarChart } from "react-icons/md";
-import { GoBookmark } from "react-icons/go";
+import { BiRepost, BiComment } from "react-icons/bi";
+import { MdBarChart, MdOutlineReport, MdOutlineBlock } from "react-icons/md";
+import { GoBookmark, GoHeart } from "react-icons/go";
 import { RiShare2Line, RiDeleteBin6Line } from "react-icons/ri";
+import { CgProfile } from "react-icons/cg";
 import { SlOptions } from "react-icons/sl";
 import { useSelector } from "react-redux";
-import { likeUnlikePost } from "../fetch/helper";
+import { bookmarkPost, deletePost, likeUnlikePost } from "../fetch/helper";
 import "../style/profile.css";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 function Post({
   _id,
@@ -22,14 +22,19 @@ function Post({
   username,
   profilePicturePath,
   likes: initialLikes,
-  comments,
+  commentCount,
   createdAt,
   text,
+  repostCount,
+  posts,
+  setPosts,
 }) {
   const [menu, setMenu] = useState(false);
   const [likes, setLikes] = useState(initialLikes);
+  const menuRef = useRef(null);
 
   const currentUserId = useSelector((state) => state.auth?.user?._id);
+  const isAdmin = useSelector((state) => state.auth?.user?.isAdmin);
   let isSelf = currentUserId === userId;
   const token = localStorage.getItem("token");
   const navigate = useNavigate();
@@ -40,72 +45,138 @@ function Post({
     setLikes(post.likes);
   };
 
-  return (
-    <div className="flex items-start p-2 gap-2 border-t border-gray-600 w-full ">
-      <Avatar profilePhoto={profilePicturePath} userId={userId} />
+  const handleDelete = async () => {
+    try {
+      const deletePromise = deletePost(_id, currentUserId, token);
+      await toast.promise(deletePromise, {
+        loading: "Deleting Post...",
+        success: "Post deleted",
+        error: "Deletion Failed",
+      });
+      const newPosts = posts.filter((post) => post._id !== _id);
+      setPosts(newPosts);
+    } catch (error) {
+      toast.error("Failed to delete post");
+      console.log(error);
+    }
+  };
 
-      <div className="flex flex-col gap-1 w-full justify-start">
-        <div className="relative mt-1 flex gap-2 text-sm place-item-center ">
-          <p className=" font-semibold text-white">{name}</p>
-          <p className=" text-gray-400  ">@{username}</p>
-          <span className=" text-gray-400  ">20h</span>
-          <SlOptions
-            onClick={() => setMenu(!menu)}
-            className="ml-auto text-2xl p-1 rounded-full hover:bg-gray-500 hover:bg-opacity-50 "
-          />
-          {menu && isSelf && (
-            <div className="absolute top-4 right-1 p-2 rounded-xl bg-slate-950 shadow shadow-white flex flex-col gap-2 z-10">
-              <p className="flex items-center gap-2 text-red-600 ">
-                <RiDeleteBin6Line /> Delete{" "}
-              </p>
-              <p className="flex items-center gap-2">
-                <BiEditAlt /> Edit{" "}
-              </p>
-            </div>
-          )}
-        </div>
-        <p className="mb-1 font-style3  ">{text}</p>
-        {picturePath && (
-          <img
-            onClick={() => navigate(`/${_id}/photo/${picturePath}`)}
-            src={`http://localhost:1414/assets/${picturePath}`}
-            className="self-start rounded-2xl object-cover max-h-[520px] w-auto cursor-pointer"
-            alt="post"
-          />
-        )}
-        <div className="flex items-center justify-between text-xs py-2 w-full ">
-          <span className="flex items-center gap-1 text-gray-400">
-            <BiComment className="text-xl text-gray-500" />
-            37{" "}
-          </span>
-          <span className="flex items-center gap-1 text-gray-400">
-            <BiRepost className="text-2xl text-gray-500" />
-            20
-          </span>
-          <motion.span
-            animate={{ scale: isLiked ? [1, 1.3, 1] : 1 }}
-            transition={{ duration: 0.3 }}
-            onClick={likeUnlikeHandle}
-            className="flex items-center gap-1 text-gray-400 cursor-pointer"
-          >
-            {isLiked ? (
-              <FcLike className="text-xl text-gray-500" />
-            ) : (
-              <GoHeart className="text-xl text-gray-500" />
+  const handleBookmark = async () => {
+    try {
+      const bookmarkPromise = bookmarkPost(_id, currentUserId, token);
+      await toast.promise(bookmarkPromise, {
+        loading: "Loading...",
+        success: "Post Saved",
+        error: "Bookmark Failed",
+      });
+    } catch (error) {}
+  };
+
+  const menuList = [
+    ...(isAdmin || isSelf
+      ? [{ name: "Delete", icon: <RiDeleteBin6Line />, action: handleDelete }]
+      : []),
+    { name: "Profile", icon: <CgProfile />, action: null },
+    { name: "Block", icon: <MdOutlineBlock />, action: null },
+    { name: "View Engagement", icon: <MdBarChart />, action: null },
+    { name: "Bookmark Post", icon: <GoBookmark />, action: null },
+    { name: "Report", icon: <MdOutlineReport />, action: null },
+  ];
+
+  const postBtn = [
+    { count: commentCount, icon: <BiComment />, action: null },
+    { count: repostCount, icon: <BiRepost />, action: null },
+    {
+      count: Object.keys(likes).length,
+      icon: isLiked ? <FcLike /> : <GoHeart />,
+      action: likeUnlikeHandle,
+    },
+    {
+      count: Math.floor(Math.random() * 50) + 1,
+      icon: <MdBarChart />,
+      action: null,
+    },
+  ];
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setMenu(false); // Close the menu
+      }
+    };
+
+    // Add event listener to the document
+    document.addEventListener("mousedown", handleClickOutside);
+
+    // Cleanup the event listener
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  return (
+    <>
+      <div className="flex items-start px-2 py-1 gap-2 w-full ">
+        <Avatar profilePhoto={profilePicturePath} userId={userId} />
+
+        <div className="flex flex-col gap-1 w-full justify-start">
+          <div className="relative mt-1 flex gap-2 text-sm place-item-center ">
+            <p className=" font-semibold text-white">{name}</p>
+            <p className=" text-gray-400  ">@{username}</p>
+            <span className=" text-gray-400  ">20h</span>
+            <SlOptions
+              onClick={() => setMenu(!menu)}
+              className="ml-auto text-2xl p-1 rounded-full hover:bg-gray-500 hover:bg-opacity-50 "
+            />
+            {menu && (
+              <ul
+                ref={menuRef}
+                className="absolute top-4 right-1 p-2 rounded-xl bg-black bg-opacity-50 backdrop-blur-sm shadow-menu shadow-white space-y-4 text-lg "
+              >
+                {menuList.map((item) => (
+                  <li
+                    key={item.name}
+                    className="flex gap-3 items-center cursor-pointer"
+                    onClick={item.action}
+                  >
+                    {item.icon} {item.name}
+                  </li>
+                ))}
+              </ul>
             )}
-            {Object.keys(likes).length}
-          </motion.span>
-          <span className="flex items-center gap-1 text-gray-400">
-            <MdBarChart className="text-xl text-gray-500" />
-            114
-          </span>
-          <div className="flex gap-2 text-xl ">
-            <GoBookmark />
-            <RiShare2Line />
+          </div>
+          <p className="mb-1">{text}</p>
+          {picturePath && (
+            <img
+              onClick={() => navigate(`/${_id}/photo/${picturePath}`)}
+              src={`http://localhost:1414/assets/${picturePath}`}
+              className="self-start rounded-2xl object-cover max-h-[520px] w-auto cursor-pointer"
+              alt="post"
+            />
+          )}
+
+          {/* post buttons */}
+          <div className="flex items-center justify-between text-xs mt-2 w-full ">
+            {postBtn.map((btn, index) => (
+              <span
+                key={index}
+                onClick={btn.action}
+                className="flex items-center gap-1  text-xl cursor-pointer"
+              >
+                {btn.icon}
+                <span className="text-xs text-gray-400">{btn.count}</span>
+              </span>
+            ))}
+
+            <div className="flex gap-2 text-xl cursor-pointer ">
+              <GoBookmark onClick={handleBookmark} />
+              <RiShare2Line />
+            </div>
           </div>
         </div>
       </div>
-    </div>
+      <hr />
+    </>
   );
 }
 

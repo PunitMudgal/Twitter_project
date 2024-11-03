@@ -46,7 +46,7 @@ function UploadWidget() {
   };
 
   return (
-    <div className="p-4 border-b border-purple-700 w-full h-fit">
+    <div className="px-2 py-3 border-b border-purple-700 w-full h-fit">
       <div className="flex gap-2 w-full items-start ">
         <Avatar
           className="flex-shrink-0  "

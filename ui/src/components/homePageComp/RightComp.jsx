@@ -42,7 +42,7 @@ function RightComp() {
   const fetchSuggestedFriends = async () => {
     try {
       setSuggestionLoading(true);
-      const response = await getFriendSuggestion(currentUser._id, token);
+      const response = await getFriendSuggestion(token);
       setSuggestedFriends(response);
     } catch (error) {
       console.error(error);

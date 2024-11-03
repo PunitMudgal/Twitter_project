@@ -178,7 +178,10 @@ function Profile() {
           <div className="flex flex-wrap mt-4">
             <p className="text-xl font-bold ">{name}</p>
             {isAdmin && (
-              <span className="border border-purple-500 rounded-3xl text-sm px-2 ml-2 flex gap-2 items-center">
+              <span
+                onDoubleClick={() => navigate(`/home/${id}/admin/dashboard`)}
+                className="border border-purple-500 rounded-3xl text-sm px-2 ml-2 flex gap-2 items-center"
+              >
                 <img src={tick} className="h-4 w-4 =" alt="" />
                 Admin
               </span>

@@ -21,7 +21,6 @@ function LeftComp() {
   const [menu, setMenu] = useState(false);
   const menuRef = useRef(null);
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   const user = useSelector(selectUser);
   const { name, isAdmin, username, _id, profilePicturePath } = user;
@@ -55,7 +54,7 @@ function LeftComp() {
   }, []);
 
   return (
-    <div className="col-span-3 flex flex-col justify-between sticky top-0 overflow-hidden ">
+    <div className="col-span-3 flex flex-col justify-between sticky top-0 overflow-hidden min-w-fit sm:hidden">
       {/* head logo */}
       <Link
         to="/home"
@@ -65,7 +64,7 @@ function LeftComp() {
       </Link>
 
       {/* icons */}
-      <div className="flex flex-col place-items-start gap-3 ml-[37%] p-3 font-style2">
+      <div className="flex flex-col place-items-start gap-3 ml-[37%] p-3 font-style2 lg:mx-auto lg:gap-1 ">
         {Icons.map((icon) => (
           <NavLink
             end
@@ -80,7 +79,7 @@ function LeftComp() {
             }
           >
             <img src={icon.icon} className="h-7 w-full invert " alt="icon" />
-            <span>{icon.name}</span>
+            <span className="md:hidden">{icon.name}</span>
           </NavLink>
         ))}
 
@@ -92,17 +91,21 @@ function LeftComp() {
       {/* profile at bottom */}
       <div
         onClick={() => setMenu(true)}
-        className="flex gap-2 items-center p-2 ml-[37%] text-sm font-semibold mt-auto rounded-3xl hover:bg-purple-500 hover:bg-opacity-20 "
+        className="flex gap-2 items-center p-2 ml-[37%] text-sm font-semibold mt-auto rounded-3xl hover:bg-purple-500 hover:bg-opacity-20 lg:mx-auto "
       >
         <Avatar profilePhoto={profilePicturePath} userId={_id} />
-        <div className="flex flex-col">
+        <div className="flex flex-col lg:hidden">
           <p className="flex gap-1 items-center capitalize">
             {truncateUsername(name)}
             {isAdmin && <img src={tick} className="h-4 w-4" alt="purpletick" />}
           </p>
           <p className="text-gray2 text-xs">@{truncateUsername(username)}</p>
         </div>
-        <img className="h-4 w-4 ml-auto invert " src={menuIcon} alt="menu" />
+        <img
+          className="lg:hidden h-4 w-4 ml-auto invert "
+          src={menuIcon}
+          alt="menu"
+        />
       </div>
 
       {/* logout menu */}

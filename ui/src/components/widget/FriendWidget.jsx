@@ -31,7 +31,7 @@ function FriendWidget({
       toast.promise(followPromise, {
         loading: "Loading...",
         success: "Followed successfully",
-        error: (err) => err.response?.data?.message,
+        error: (error) => error.response?.data?.message || "An error occurred",
       });
       // setSuggestedFriends((prev) =>
       //   prev.map((friend) =>

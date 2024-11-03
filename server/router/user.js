@@ -6,8 +6,9 @@ const router = express.Router();
 
 /** FIND */
 router.get("/:id", controller.getUser);
-router.get("/suggestFriends/:userId", Auth, controller.getFriendSuggestions);
+router.post("/suggestFriends", Auth, controller.getFriendSuggestions);
 router.get("/search/:name", Auth, controller.searchUser);
+router.post("/admin/get-users", Auth, controller.getAllUsers);
 
 /** POST */
 router.post("/getAllFollowing", Auth, controller.getAllFollowing);
@@ -18,6 +19,5 @@ router.put("/:id/follow", Auth, controller.followUser);
 router.put("/:id/unfollow", Auth, controller.unfollowUser);
 
 /** DELETE */
-router.delete("/deleteAll", controller.deleteAllUsers);
-router.delete("/deleteUser/:id", controller.deleteUser);
+router.delete("/deleteUser/:userId", Auth, controller.deleteUser);
 export default router;

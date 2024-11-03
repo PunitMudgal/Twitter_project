@@ -10,6 +10,8 @@ export async function getUserFromToken() {
   return decode;
 }
 
+/** --------- USER --------------- */
+
 /** REGISTER USER */
 export async function registerUser(userData) {
   try {
@@ -64,7 +66,7 @@ export async function updateUser(values, token) {
 // follow user
 export async function follow(userId, friendId, token) {
   try {
-    await axios.put(
+    const { data } = await axios.put(
       `/user/${friendId}/follow`,
       { userId },
       {
@@ -73,19 +75,17 @@ export async function follow(userId, friendId, token) {
         },
       }
     );
-    return;
+    console.log("msg", data.message);
+    return data;
   } catch (error) {
-    throw new Error(
-      error.response?.data?.message ||
-        "An error occurred while following the user."
-    );
+    throw new Error(error.response?.data?.message);
   }
 }
 
 // unfollow user
 export async function unfollow(userId, friendId, token) {
   try {
-    await axios.put(
+    const { message } = await axios.put(
       `/user/${friendId}/unfollow`,
       { userId },
       {
@@ -94,7 +94,7 @@ export async function unfollow(userId, friendId, token) {
         },
       }
     );
-    return;
+    return message;
   } catch (error) {
     throw new Error(
       error.response?.data?.message ||
@@ -104,16 +104,20 @@ export async function unfollow(userId, friendId, token) {
 }
 
 // get Friends suggestion
-export async function getFriendSuggestion(userId, token) {
+export async function getFriendSuggestion(token) {
   try {
-    const { data } = await axios.get(`user/suggestFriends/${userId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const { data } = await axios.post(
+      `user/suggestFriends`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     return data;
   } catch (error) {
-    throw new Error("Wrong credentials");
+    throw new Error("Wrong credentials", error);
   }
 }
 
@@ -160,6 +164,8 @@ export async function getAllFollower(follower, token) {
   }
 }
 
+/** --------- POSTS  --------------- */
+
 export async function createPost(values, token) {
   try {
     const { data } = await axios.post(`/post`, values, {
@@ -167,6 +173,7 @@ export async function createPost(values, token) {
         Authorization: `Bearer ${token}`,
       },
     });
+    console.log("data after creating post", data);
   } catch (error) {
     throw new Error("Error while creating post");
   }
@@ -190,7 +197,25 @@ export async function getFriendPosts(userId, token, page) {
 
 export async function getFeedPosts(page) {
   try {
-    const { data } = await axios.get(`/post/getAll?page=${page}&limit=5`);
+    const { data } = await axios.get(
+      `/post/foryou/getAll?page=${page}&limit=5`
+    );
+    return data;
+  } catch (error) {
+    throw new Error("Error while fetching feed post");
+  }
+}
+
+export async function getFollowingPosts(page, userId, token) {
+  try {
+    const { data } = await axios.get(
+      `/post/following/${userId}?page=${page}&limit=5`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     return data;
   } catch (error) {
     throw new Error("Error while fetching feed post");
@@ -211,5 +236,64 @@ export async function likeUnlikePost(postId, userId, token) {
     return data;
   } catch (error) {
     throw new Error("Error while liking post");
+  }
+}
+
+export async function bookmarkPost(postId, userId, token) {
+  try {
+    await axios.patch(
+      `/post/bookmark/${postId}`,
+      { userId },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return;
+  } catch (err) {
+    throw new Error("Error while saving (bookmark) post");
+  }
+}
+
+export async function deletePost(postId, userId, token) {
+  try {
+    await axios.delete(`/post/${postId}/delete`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      data: { userId },
+    });
+    return;
+  } catch (error) {
+    throw new Error("Error while deleting post");
+  }
+}
+
+/** ADMIN DASHBOARD */
+export async function getAllUsers(token) {
+  try {
+    const { data } = await axios.post(
+      `/user/admin/get-users`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return data;
+  } catch (error) {}
+}
+
+export async function deleteUser(userId, token) {
+  try {
+    await axios.delete(`/user/deleteUser/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  } catch (error) {
+    throw new Error("Error while deleting user");
   }
 }
