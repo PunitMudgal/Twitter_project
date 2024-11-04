@@ -167,7 +167,15 @@ export const deleteUser = async (req, res) => {
   const { userId: loggedInUserId, isAdmin } = req.user;
   if (userId === loggedInUserId || isAdmin) {
     try {
-      await User.findByIdAndDelete(userId);
+      const deleteUser = await User.findByIdAndDelete(userId);
+      if (!deleteUser) return res.status(404).json("User not found");
+
+      await User.updateMany(
+        { following: userId },
+        { $pull: { following: userId } }
+      );
+
+      await Post.deleteMany({ userId });
       res.status(200).json("Account deleted successfully");
     } catch (err) {
       return res.status(500).json(err);

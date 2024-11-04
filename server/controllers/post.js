@@ -153,6 +153,34 @@ export async function bookmarkPost(req, res) {
   }
 }
 
+// export async function getBookmarkedPosts(req, res) {
+//   const { userId } = req.params;
+//   try {
+//     const user = await User.findById(userId).select("bookmark").lean();
+//     if (!user) {
+//       return res.status(404).json({ message: "User not found" });
+//     }
+//     const bookmarkedPosts = await Post.find({
+//       _id: { $in: user.bookmark },
+//     }).lean();
+//     res.status(200).json(bookmarkedPosts);
+//   } catch (error) {
+//     res.status(500).json({ message: "Server error" });
+//   }
+// }
+
+export async function getBookmarkedPosts(req, res) {
+  const { bookmark } = req.body;
+  try {
+    const bookmarkedPosts = await Post.find({
+      _id: { $in: bookmark },
+    }).lean();
+    res.status(200).json(bookmarkedPosts);
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+}
+
 export async function deletePost(req, res) {
   const { postId } = req.params;
   const { userId } = req.body;

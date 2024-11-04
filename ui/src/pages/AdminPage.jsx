@@ -18,7 +18,6 @@ function AdminPage() {
     try {
       const data = await getAllUsers(token);
       setUsers(data);
-      console.log("users", users);
     } catch (error) {
       toast.error("Error fetching users");
     } finally {
