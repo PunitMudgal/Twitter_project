@@ -9,7 +9,7 @@ import backIcon from "../assets/next.svg";
 import tick from "../assets/tick.png";
 import defaultPhoto from "../assets/profile.png";
 import message from "../assets/envelope.svg";
-import FetchHook from "../fetch/fetchHook";
+import useFetchHook from "../fetch/fetchHook";
 import Loading from "../components/Loading";
 import Post from "../components/Post";
 import { useCenterRef } from "../components/CenterRefContext";
@@ -32,7 +32,7 @@ function Profile() {
   const token = useSelector((state) => state.auth?.token);
 
   const { id } = useParams();
-  const { isLoading, serverError } = FetchHook(id);
+  const { isLoading, serverError } = useFetchHook(id);
   const isSelf = LogedInUsername === id;
   const navigate = useNavigate();
   const centerRef = useCenterRef();

@@ -13,7 +13,7 @@ import businessIcon from "../../assets/lightning.svg";
 import communitiesIcon from "../../assets/communities.svg";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { selectUser, setToken, truncateUsername } from "../../store/authSlice";
 

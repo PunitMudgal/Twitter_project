@@ -41,10 +41,8 @@ function Register() {
 
         // Await the promise and get the response
         const res = await registerPromise;
-
         if (res && res.data) {
-          const { user, token } = res.data;
-          dispatch(setUser(user));
+          const token = res.data;
           dispatch(setToken(token));
           navigate("/register-profile");
         } else toast.error("Invalid response from the server, Try again");

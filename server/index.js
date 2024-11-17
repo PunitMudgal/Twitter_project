@@ -68,6 +68,9 @@ connectDb().then(() => {
       console.log(`server started at ${process.env.BACKEND_SERVER_URL + port}`);
     });
   } catch (error) {
-    console.log("cannot connect to the server", error);
+    console.log(
+      "cannot connect to the server, Please check your Internet Server",
+      error
+    );
   }
 });

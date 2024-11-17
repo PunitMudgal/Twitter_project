@@ -29,7 +29,7 @@ function SignIn() {
         error: "Login Failed!",
       });
       loginPromise.then(function (res) {
-        let { token, user } = res.data;
+        let token = res.data;
         localStorage.setItem("token", token);
 
         navigate("/home");

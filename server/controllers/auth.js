@@ -53,15 +53,15 @@ export const register = async (req, res) => {
     newUser
       .save()
       .then(async () => {
-        const user = await User.findOne({ username });
+        const user = await User.findOne({ username })
+          .select("_id email username isAdmin")
+          .lean();
         const token = jwt.sign(
           { userId: user._id, email, username, isAdmin: user.isAdmin },
           process.env.JWT_SECRET,
           { expiresIn: "48h" }
         );
-        const userObj = user.toObject(); // Convert to plain object
-        delete userObj.password; // Remove sensitive information
-        res.status(201).json({ token, user: userObj });
+        res.status(201).json(token);
       })
       .catch((error) =>
         res.status(500).send({ err: "unable to save user", error })
@@ -97,9 +97,7 @@ export async function login(req, res) {
       process.env.JWT_SECRET,
       { expiresIn: "48h" }
     );
-    const userObj = user.toObject(); // Convert to plain object
-    delete userObj.password; // Remove sensitive information
-    res.status(200).json({ token, user: userObj });
+    res.status(200).json(token);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

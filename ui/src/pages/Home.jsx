@@ -1,6 +1,5 @@
 import LeftComp from "../components/homePageComp/LeftComp";
 import RightComp from "../components/homePageComp/RightComp";
-import { useSelector } from "react-redux";
 import { Outlet } from "react-router-dom";
 import useFetchHook from "../fetch/fetchHook";
 import Loading from "../components/Loading";

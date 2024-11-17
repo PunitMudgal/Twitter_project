@@ -1,4 +1,4 @@
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { getUserFromToken } from "./helper.js";
 import { useEffect, useMemo, useState } from "react";
 import { setFriendProfile, setUser } from "../store/authSlice.js";
@@ -7,12 +7,10 @@ import axios from "axios";
 axios.defaults.baseURL = "http://localhost:1414";
 
 export default function useFetchHook(query) {
-  const user = useSelector((state) => state.auth.user);
-
   const dispatch = useDispatch();
   // Memoize token to prevent recomputation on every render
-  // const token = useMemo(() => localStorage.getItem("token"), []);
-  const token = localStorage.getItem("token");
+  const token = useMemo(() => localStorage.getItem("token"), []);
+  // const token = localStorage.getItem("token");
 
   const [getData, setData] = useState({
     isLoading: false,
