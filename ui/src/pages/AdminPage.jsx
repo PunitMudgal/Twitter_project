@@ -10,13 +10,13 @@ import { useNavigate } from "react-router-dom";
 function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [users, setUsers] = useState([]);
-  const token = localStorage.getItem("token");
+
   const navigate = useNavigate();
 
   const fetchAllUsers = async () => {
     setLoading(true);
     try {
-      const data = await getAllUsers(token);
+      const data = await getAllUsers();
       setUsers(data);
     } catch (error) {
       toast.error("Error fetching users");
@@ -26,7 +26,7 @@ function AdminPage() {
   };
 
   const handleDeleteUser = async (userId) => {
-    const deletePromise = deleteUser(userId, token);
+    const deletePromise = deleteUser(userId);
     await toast.promise(deletePromise, {
       loading: "Deleting User...",
       success: "User Deleted Successfully",

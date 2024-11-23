@@ -1,20 +1,36 @@
 import jwt from "jsonwebtoken";
+import User from "../models/User.js";
 
 /** authorization middlewar */
-export default function Auth(req, res, next) {
+export default async function Auth(req, res, next) {
   try {
-    // Check if the authorization header exists
-    const authHeader = req.headers.authorization;
+    const token = req.cookies.token;
 
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(401).json({ error: "Authorization token missing!" });
+    if (!token) {
+      return res
+        .status(401)
+        .json({ message: "Unauthorized - No Token Provided" });
     }
 
-    const token = authHeader.split(" ")[1];
-    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decodedToken;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    if (!decoded) {
+      return res.status(401).json({ message: "Unauthorized - Invalid Token" });
+    }
+
+    const user = await User.findById(decoded.userId)
+      .select("-password -bio -from -coverPicture")
+      .lean();
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    req.user = user;
+    req.user.userId = decoded.userId;
+
     next();
   } catch (error) {
-    res.status(401).json({ error: "Authentication Failed!" });
+    res.status(401).json({ error: "Error in Auth middleware!", error });
   }
 }

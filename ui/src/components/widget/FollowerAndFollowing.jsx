@@ -17,7 +17,6 @@ function FollowerAndFollowing() {
   const currentUser = useSelector((state) => state.auth?.user);
   const { name, username, isAdmin, following, follower } =
     useSelector((state) => state.auth.friendProfile) || {};
-  const token = useSelector((state) => state.auth?.token);
   const followings = useSelector((state) => state.auth.following) || {};
   const followers = useSelector((state) => state.auth.follower) || {};
 
@@ -26,7 +25,7 @@ function FollowerAndFollowing() {
   /** Fetch Following */
   const fetchFollowing = async () => {
     try {
-      const data = await getAllFollowing(following, token);
+      const data = await getAllFollowing(following);
       dispatch(setFollowing(data));
     } catch (error) {
       toast.error("Error fetching following:", error);
@@ -34,7 +33,7 @@ function FollowerAndFollowing() {
   };
 
   useEffect(() => {
-    if (following?.length && token) {
+    if (following?.length) {
       fetchFollowing(); // Call the async function
     }
   }, [following]);
@@ -42,7 +41,7 @@ function FollowerAndFollowing() {
   /** Fetch Followers */
   const fetchFollowers = async () => {
     try {
-      const data = await getAllFollower(follower, token);
+      const data = await getAllFollower(follower);
       dispatch(setFollower(data));
     } catch (error) {
       toast.error("Error fetching followers:", error);
@@ -50,7 +49,7 @@ function FollowerAndFollowing() {
   };
 
   useEffect(() => {
-    if (follower?.length && token) {
+    if (follower?.length) {
       fetchFollowers(); // Call the async function
     }
   }, [follower]);

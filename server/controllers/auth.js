@@ -1,20 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
-
-/** VERIFY USER */
-export async function verifyUser(req, res, next) {
-  try {
-    const { email } = req.method == "GET" ? req.query : req.body;
-
-    // check the user existance
-    let exist = await User.findOne({ email });
-    if (!exist) return res.status(404).send({ error: "user not found!" });
-    next();
-  } catch (error) {
-    return res.status(404).send({ error: "error in finding user!" });
-  }
-}
+import { generateToken } from "../lib/generateToken.js";
 
 /** GET ALL USERS */
 export const getAllUsers = async (req, res) => {
@@ -49,23 +36,20 @@ export const register = async (req, res) => {
       from: "",
     });
 
-    // save new user & generate token
-    newUser
-      .save()
-      .then(async () => {
-        const user = await User.findOne({ username })
-          .select("_id email username isAdmin")
-          .lean();
-        const token = jwt.sign(
-          { userId: user._id, email, username, isAdmin: user.isAdmin },
-          process.env.JWT_SECRET,
-          { expiresIn: "48h" }
-        );
-        res.status(201).json(token);
-      })
-      .catch((error) =>
-        res.status(500).send({ err: "unable to save user", error })
-      );
+    if (newUser) {
+      generateToken(newUser._id, res);
+      await newUser.save();
+
+      res.status(201).json({
+        userId: newUser._id,
+        name: newUser.name,
+        username: newUser.username,
+        profilePicturePath: newUser.profilePicturePath,
+        isAdmin: newUser.isAdmin,
+      });
+    } else {
+      res.status(400).json({ message: "invalid user data" });
+    }
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -87,18 +71,34 @@ export async function login(req, res) {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).json({ msg: "Invalid credentials" });
 
-    const token = jwt.sign(
-      {
-        userId: user._id,
-        email: user.email,
-        username: user.username,
-        isAdmin: user.isAdmin,
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: "48h" }
-    );
-    res.status(200).json(token);
+    generateToken(user._id, res);
+    res.status(200).json({
+      userId: user._id,
+      name: user.name,
+      username: user.username,
+      profilePicturePath: user.profilePicturePath,
+      isAdmin: user.isAdmin,
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 }
+
+export const logout = (req, res) => {
+  try {
+    res.cookie("token", "", { maxAge: 0 });
+    res.status(200).json({ message: "Logged out successfully" });
+  } catch (error) {
+    console.log("Error in logout controller", error.message);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const checkAuth = (req, res) => {
+  try {
+    res.status(200).json(req.user);
+  } catch (error) {
+    console.log("Error in checkAuth", error.message);
+    res.status(500).json({ message: "internal server error" });
+  }
+};

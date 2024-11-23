@@ -11,7 +11,6 @@ import avatar from "../assets/profile.png";
 
 function RegisterProfileCard() {
   const user = useSelector((state) => state.auth.user);
-  const token = useSelector((state) => state.auth.token);
 
   const [name, setName] = useState("");
   const [image, setImage] = useState(null);
@@ -29,7 +28,7 @@ function RegisterProfileCard() {
         formData.append("picture", image);
         formData.append("profilePicturePath", image.name);
       }
-      const updatePromise = updateUser(formData, token);
+      const updatePromise = updateUser(formData);
       toast.promise(updatePromise, {
         loading: "Updating Please wait...",
         success: "Update successful",

@@ -19,7 +19,6 @@ function UploadWidget() {
 
   const { _id, profilePicturePath } = user;
 
-  const token = useSelector((state) => state.auth?.token);
   const [text, setText] = useState("");
   const [photo, setPhoto] = useState(null);
   const [prevPhoto, setPrevPhoto] = useState(null);
@@ -33,7 +32,7 @@ function UploadWidget() {
       formData.append("picture", photo);
       formData.append("picturePath", photo.name);
     }
-    const uploadPromise = createPost(formData, token);
+    const uploadPromise = createPost(formData);
     toast.promise(uploadPromise, {
       loading: "upload Please wait...",
       success: "upload successful",

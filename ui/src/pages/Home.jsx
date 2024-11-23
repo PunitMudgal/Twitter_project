@@ -5,17 +5,12 @@ import useFetchHook from "../fetch/fetchHook";
 import Loading from "../components/Loading";
 import { useRef } from "react";
 import { CenterRefProvider } from "../components/CenterRefContext";
+import { useSelector } from "react-redux";
 
 function Home() {
-  const { isLoading, serverError } = useFetchHook();
+  // const { isLoading, serverError } = useFetchHook();
+  const isLoading = useSelector((state) => state.auth.isCheckingAuth);
   const centerRef = useRef(null); // for controlling center scrolling
-
-  if (serverError)
-    return (
-      <h1 className="text-xl bg-red-400 text-red-900 p-4 rounded-lg">
-        Server Error Please try again...
-      </h1>
-    );
 
   if (isLoading) return <Loading />;
   return (

@@ -19,7 +19,6 @@ function CenterComp({ isLoading }) {
 
   const centerRef = useCenterRef();
   const loggedInUserId = useSelector((state) => state.auth?.user?._id);
-  const token = localStorage.getItem("token");
 
   const fetchPosts = useCallback(async () => {
     setPostLoading(true);
@@ -27,7 +26,7 @@ function CenterComp({ isLoading }) {
       const fetchMethod =
         activeTab === "For You" ? getFeedPosts : getFollowingPosts;
       const { posts: newPosts, hasMore: morePostsAvailable } =
-        await fetchMethod(page, loggedInUserId, token);
+        await fetchMethod(page, loggedInUserId);
 
       setPosts((prevPosts) =>
         page === 1 ? newPosts : [...prevPosts, ...newPosts]
@@ -38,7 +37,7 @@ function CenterComp({ isLoading }) {
     } finally {
       setPostLoading(false);
     }
-  }, [activeTab, page, loggedInUserId, token]);
+  }, [activeTab, page, loggedInUserId]);
 
   useEffect(() => {
     fetchPosts();

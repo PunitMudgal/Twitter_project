@@ -10,11 +10,10 @@ import "../style/authenticationStyle.css";
 import logo from "../assets/blue.png";
 import { registerValidation } from "../helper/validation.js";
 import { registerUser } from "../fetch/helper";
-import { setToken, setUser } from "../store/authSlice";
 
 function Register() {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+
   const [isConfPassCorrenct, setIsconfPassCorrect] = useState(false);
 
   const { values, handleChange, handleSubmit } = useFormik({
@@ -32,22 +31,15 @@ function Register() {
       try {
         let registerPromise = registerUser(values);
 
-        // Using toast for notificatino feedback
         toast.promise(registerPromise, {
           loading: "Creating...",
           success: "Register Successful",
           error: "Registration Failed",
         });
 
-        // Await the promise and get the response
         const res = await registerPromise;
-        if (res && res.data) {
-          const token = res.data;
-          dispatch(setToken(token));
-          navigate("/register-profile");
-        } else toast.error("Invalid response from the server, Try again");
+        navigate("/register-profile");
       } catch (error) {
-        // Check if the backend returned a custom error message
         if (
           error.response &&
           error.response.data &&
@@ -55,10 +47,10 @@ function Register() {
         ) {
           toast.error(error.response.data.error); // Show the error message from backend
         } else {
-          toast.error("Registration Failed. Please try again later."); // Fallback for other errors
+          toast.error("Registration Failed. Please try again later.");
         }
       } finally {
-        action.setSubmitting(false); // Ensure submit state is reset
+        action.setSubmitting(false);
       }
     },
   });

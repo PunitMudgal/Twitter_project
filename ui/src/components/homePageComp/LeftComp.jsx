@@ -12,29 +12,32 @@ import notificationIcon from "../../assets/bell.svg";
 import businessIcon from "../../assets/lightning.svg";
 import communitiesIcon from "../../assets/communities.svg";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { selectUser, setToken, truncateUsername } from "../../store/authSlice";
+import { selectUser, setUser, truncateUsername } from "../../store/authSlice";
+import { Logout } from "../../fetch/helper";
 
 function LeftComp() {
   const [menu, setMenu] = useState(false);
   const menuRef = useRef(null);
+
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const user = useSelector(selectUser);
   const { name, isAdmin, username, _id, profilePicturePath } = user;
 
   const Icons = [
-    { name: "home", icon: homeIcon },
-    { name: "search", icon: searchIcon },
-    { name: "notification", icon: notificationIcon },
-    { name: "message", icon: messageIcon },
-    { name: "commuinities", icon: communitiesIcon },
-    { name: "business", icon: businessIcon },
-    { name: "profile", icon: profileIcon },
-    { name: "more", icon: moreIcon },
-    { name: "premium", icon: premiumIcon },
+    { name: "home", icon: homeIcon, route: "/home" },
+    { name: "search", icon: searchIcon, route: "/search" },
+    { name: "notifications", icon: notificationIcon, route: "/notifications" },
+    { name: "messages", icon: messageIcon, route: "/messenger" },
+    { name: "commuinities", icon: communitiesIcon, route: "/communities" },
+    { name: "business", icon: businessIcon, route: "/business" },
+    { name: "profile", icon: profileIcon, route: `/home/${_id}` },
+    { name: "more", icon: moreIcon, route: "/more" },
+    { name: "premium", icon: premiumIcon, route: "/premium" },
   ];
 
   useEffect(() => {
@@ -53,6 +56,12 @@ function LeftComp() {
     };
   }, []);
 
+  const handleLogout = () => {
+    Logout();
+    dispatch(setUser(null));
+    navigate("/");
+  };
+
   return (
     <div className="col-span-3 flex flex-col justify-between sticky top-0 overflow-hidden min-w-fit sm:hidden">
       {/* head logo */}
@@ -68,7 +77,7 @@ function LeftComp() {
         {Icons.map((icon) => (
           <NavLink
             end
-            to={`/${icon.name === "profile" ? `home/${_id}` : `${icon.name}`}`}
+            to={icon.route}
             key={icon.name}
             className={({ isActive }) =>
               `${
@@ -119,7 +128,7 @@ function LeftComp() {
           </Link>
           <Link
             to="/signin"
-            onClick={() => dispatch(setToken(null))}
+            onClick={handleLogout}
             className="hover:bg-blue4 p-2"
           >
             Logout @{username}
@@ -131,4 +140,3 @@ function LeftComp() {
 }
 
 export default LeftComp;
-// to={icon.name === "profile" ? "/home/profile" : null}

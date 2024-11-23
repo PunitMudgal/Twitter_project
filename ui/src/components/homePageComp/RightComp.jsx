@@ -1,35 +1,25 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { RiRefreshLine } from "react-icons/ri";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 
 import tick from "../../assets/tick.png";
 import chatIcon from "../../assets/chat.svg";
-import searchIcon from "../../assets/search.svg";
 import Avatar from "../Avatar";
-import {
-  getAllFollowing,
-  getFriendSuggestion,
-  searchUser,
-} from "../../fetch/helper";
+import { getAllFollowing, getFriendSuggestion } from "../../fetch/helper";
 import Loading from "../Loading";
 import "../../style/profile.css";
 import FriendWidget from "../widget/FriendWidget";
-import { setSearchResult, truncateUsername } from "../../store/authSlice";
+import { truncateUsername } from "../../store/authSlice";
+import Search from "../Search";
 
 function RightComp() {
-  const dispatch = useDispatch();
-
   const currentUser = useSelector((state) => state.auth?.user);
-  const token = useSelector((state) => state.auth?.token);
-  const searchResult = useSelector((state) => state.auth?.searchResult);
 
   const [isRotating, setIsRotating] = useState(false);
   const [suggestedFriends, setSuggestedFriends] = useState([]);
   const [followings, setFollowings] = useState([]);
   const [suggestionLoading, setSuggestionLoading] = useState(true);
-  const [searchText, setSearchText] = useState("");
-  const [searchMenu, setSearchMenu] = useState(false);
 
   const handleRefreshClick = () => {
     setIsRotating(true);
@@ -42,7 +32,7 @@ function RightComp() {
   const fetchSuggestedFriends = async () => {
     try {
       setSuggestionLoading(true);
-      const response = await getFriendSuggestion(token);
+      const response = await getFriendSuggestion();
       setSuggestedFriends(response);
     } catch (error) {
       console.error(error);
@@ -52,7 +42,7 @@ function RightComp() {
   };
 
   useEffect(() => {
-    if (currentUser?._id && token) {
+    if (currentUser?._id) {
       fetchSuggestedFriends();
     }
   }, [currentUser]);
@@ -60,7 +50,7 @@ function RightComp() {
   /** Fetch Following */
   const fetchFollowing = async () => {
     try {
-      const data = await getAllFollowing(currentUser?.following, token);
+      const data = await getAllFollowing(currentUser?.following);
       setFollowings(data);
     } catch (error) {
       console.error("Error fetching friends:", error);
@@ -68,29 +58,10 @@ function RightComp() {
   };
 
   useEffect(() => {
-    if (currentUser?.following?.length && token) {
+    if (currentUser?.following?.length) {
       fetchFollowing(); // Call the async function
     }
-  }, [currentUser?.following, token]);
-
-  /** SEARCH USER */
-  const submitSearch = async () => {
-    if (searchText) {
-      const data = await searchUser(searchText.toLocaleLowerCase(), token);
-      dispatch(setSearchResult(data));
-    }
-  };
-
-  useEffect(() => {
-    if (searchMenu) {
-      const timer = setTimeout(() => submitSearch(), 400);
-
-      //clean up function
-      return () => {
-        clearTimeout(timer);
-      };
-    }
-  }, [searchText]);
+  }, [currentUser?.following]);
 
   /** for popup animations in friends and suggestion list*/
   const containerVariants = {
@@ -110,40 +81,7 @@ function RightComp() {
     <div className="col-span-3 flex flex-col gap-4 sticky top-0 overflow-hidden lg:hidden ">
       {/* search bar (top) */}
       <div className="sticky top-0 w-screen h-12 flex bg-black items-center ">
-        <div className=" mx-[4%] flex items-center gap-2  bg-gray-800 p-1 my-1 rounded-3xl ">
-          <img
-            src={searchIcon}
-            alt="search"
-            className="h-9 p-2 w-auto invert"
-            onClick={submitSearch}
-          />
-          <input
-            onChange={(e) => setSearchText(e.target.value)}
-            value={searchText}
-            type="text"
-            placeholder="Search"
-            className="text-sm bg-transparent w-full p-1 focus:outline-2 outline-purple-600 "
-            onFocus={() => setSearchMenu(true)}
-            onBlur={() => setSearchMenu(false)}
-          />
-        </div>
-        {searchMenu && (
-          <div className="p-2 rounded absolute top-[50px] left-12 shadow-md shadow-gray-700 bg-slate-950 ">
-            {!searchResult ? (
-              <p>No Result Found!</p>
-            ) : (
-              searchResult.map((user) => (
-                <FriendWidget
-                  key={user._id}
-                  {...user}
-                  currentUserFollowing={currentUser.following}
-                  setSuggestedFriends={setSuggestedFriends}
-                  fetchFollowing={fetchFollowing}
-                />
-              ))
-            )}
-          </div>
-        )}
+        <Search />
       </div>
 
       <div className="ml-[4%] w-auto flex flex-col gap-4">
@@ -178,12 +116,7 @@ function RightComp() {
                   whileHover={{ scale: 1.05 }} // Optional: scale up on hover
                   transition={{ type: "spring", stiffness: 120 }}
                 >
-                  <FriendWidget
-                    {...friend}
-                    currentUserFollowing={currentUser.following}
-                    setSuggestedFriends={setSuggestedFriends}
-                    fetchFollowing={fetchFollowing}
-                  />
+                  <FriendWidget {...friend} setFollowings={setFollowings} />
                 </motion.div>
               ))}
             </motion.div>

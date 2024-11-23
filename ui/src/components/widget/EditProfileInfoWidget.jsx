@@ -12,7 +12,6 @@ function EditProfileInfoWidget() {
   const navigate = useNavigate();
 
   const UserProfile = useSelector((state) => state.auth.friendProfile);
-  const token = useSelector((state) => state.auth.token);
 
   const [profilePicturePath, setProfilePicturePath] = useState(null);
   const [previewProfile, setPreviewProfile] = useState(null);
@@ -62,7 +61,7 @@ function EditProfileInfoWidget() {
         formData.append("profilePicturePath", profilePicturePath?.name);
       }
 
-      const updatePromise = updateUser(formData, token);
+      const updatePromise = updateUser(formData);
       toast.promise(updatePromise, {
         loading: "Updating Please wait...",
         success: "Update successful",

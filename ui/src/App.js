@@ -1,10 +1,13 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { Suspense, lazy } from "react";
+import { Suspense, lazy, useEffect } from "react";
 import ProtectRoutes from "./helper/ProtectRoutes";
 import { Toaster } from "react-hot-toast";
 import { AppLayoutAuthentication, AppLayoutRegister } from "./pages/AppLayout";
 import CenterComp from "./components/homePageComp/CenterComp";
 import Logo from "./assets/blue.png";
+import Messenger from "./pages/Messenger";
+import { checkAuth } from "./store/authSlice";
+import { useDispatch } from "react-redux";
 
 const Home = lazy(() => import("./pages/Home"));
 const SignIn = lazy(() => import("./authentication/SignIn"));
@@ -23,6 +26,8 @@ const FollowerAndFollowing = lazy(() =>
 const ErrorPage = lazy(() => import("./pages/Error404"));
 
 function App() {
+  const dispatch = useDispatch();
+
   const router = createBrowserRouter([
     {
       path: "/",
@@ -77,6 +82,14 @@ function App() {
       ],
     },
     {
+      path: "/messenger",
+      element: (
+        <ProtectRoutes>
+          <Messenger />
+        </ProtectRoutes>
+      ),
+    },
+    {
       path: "/:userId/photo/:picturePath",
       element: (
         <ProtectRoutes>
@@ -87,6 +100,10 @@ function App() {
 
     { path: "*", element: <ErrorPage /> },
   ]);
+
+  useEffect(() => {
+    dispatch(checkAuth());
+  }, [dispatch]);
 
   return (
     <>

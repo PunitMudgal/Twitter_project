@@ -3,6 +3,7 @@
 # dependencies
 ui/node_modules
 server/node_modules
+socket/node_modules
 ui/.env
 server/.env
 /.pnp

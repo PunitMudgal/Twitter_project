@@ -13,6 +13,7 @@ import useFetchHook from "../fetch/fetchHook";
 import Loading from "../components/Loading";
 import Post from "../components/Post";
 import { useCenterRef } from "../components/CenterRefContext";
+import { axiosInstance } from "../fetch/axios";
 
 function Profile() {
   const {
@@ -29,10 +30,9 @@ function Profile() {
   } = useSelector((state) => state.auth.friendProfile) || {};
 
   const LogedInUsername = useSelector((state) => state.auth?.user?._id);
-  const token = useSelector((state) => state.auth?.token);
 
   const { id } = useParams();
-  const { isLoading, serverError } = useFetchHook(id);
+  const { isLoading } = useFetchHook(id);
   const isSelf = LogedInUsername === id;
   const navigate = useNavigate();
   const centerRef = useCenterRef();
@@ -46,13 +46,8 @@ function Profile() {
     setPostLoading(true);
     try {
       // const data = await getFriendPosts(id, token, page);
-      const { data } = await axios.get(
-        `/post/${id}/posts?page=${page}&limit=4`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+      const { data } = await axiosInstance.get(
+        `/post/${id}/posts?page=${page}&limit=4`
       );
       if (page === 1) {
         setFriendPosts(data);

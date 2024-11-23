@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { truncateUsername } from "../../store/authSlice";
 import tick from "../../assets/tick.png";
 import Avatar from "../Avatar";
@@ -13,34 +13,31 @@ function FriendWidget({
   name,
   username,
   isAdmin,
-  currentUserFollowing,
-  setSuggestedFriends,
-  fetchFollowing,
+  setFollowings,
 }) {
-  const token = useSelector((state) => state.auth?.token);
   const currentUser = useSelector((state) => state.auth?.user);
   const navigate = useNavigate();
 
+  const doesContain = useMemo(
+    () => currentUser.following.includes(_id),
+    [currentUser.following, _id]
+  );
+
   // Follow
   const handleFollowUser = async (friendId) => {
-    if (!currentUser?._id || !token) {
-      return toast.error("User or token information is missing!");
+    if (!currentUser?._id) {
+      return toast.error("User information is missing!");
     }
     try {
-      const followPromise = follow(currentUser._id, friendId, token);
+      const followPromise = follow(currentUser._id, friendId);
       toast.promise(followPromise, {
         loading: "Loading...",
         success: "Followed successfully",
         error: (error) => error.response?.data?.message || "An error occurred",
       });
-      // setSuggestedFriends((prev) =>
-      //   prev.map((friend) =>
-      //     friend._id === friendId
-      //       ? { ...friend, _id, profilePicturePath, name, username, isAdmin }
-      //       : friend
-      //   )
-      // );
-      fetchFollowing();
+      followPromise.then((data) => {
+        setFollowings((prev) => [...prev, data]);
+      });
     } catch (error) {
       toast.error(error.response?.data?.message);
     }
@@ -48,22 +45,19 @@ function FriendWidget({
 
   // unfollow
   const handleUnfollowUser = async (friendId) => {
-    if (!currentUser?._id || !token) {
+    if (!currentUser?._id) {
       return toast.error("User or token information is missing!");
     }
     try {
-      const unfollowPromise = unfollow(currentUser._id, friendId, token);
+      const unfollowPromise = unfollow(currentUser._id, friendId);
       await toast.promise(unfollowPromise, {
         loading: "Loading...",
         success: "Unfollowed successfully",
         error: (err) => err.response?.data?.message,
       });
-      // setSuggestedFriends((prev) =>
-      //   prev.map((friend) =>
-      //     friend._id === friendId ? { ...friend, isFollowing: false } : friend
-      //   )
-      // );
-      fetchFollowing();
+      unfollowPromise.then((data) => {
+        setFollowings((prev) => prev.filter((usr) => usr._id !== data._id));
+      });
     } catch (error) {
       toast.error(error.response?.data?.message);
     }
@@ -84,19 +78,19 @@ function FriendWidget({
       </div>
       <button
         onClick={() => {
-          if (currentUserFollowing.includes(_id)) {
+          if (doesContain) {
             handleUnfollowUser(_id);
           } else {
             handleFollowUser(_id);
           }
         }}
         className={`p-2 px-3 rounded-3xl ml-auto ${
-          currentUserFollowing.includes(_id)
+          doesContain
             ? "border bg-transparent text-white hover:text-red-600 hover:border-red-600"
             : "text-black font-bold bg-white"
         }`}
       >
-        {currentUserFollowing.includes(_id) ? "Unfollow" : "Follow"}
+        {doesContain ? "Unfollow" : "Follow"}
       </button>
     </div>
   );

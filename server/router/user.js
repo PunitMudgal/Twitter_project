@@ -9,9 +9,10 @@ router.get("/:id", controller.getUser);
 router.post("/suggestFriends", Auth, controller.getFriendSuggestions);
 router.get("/search/:name", Auth, controller.searchUser);
 
-router.post("/admin/get-users", Auth, controller.getAllUsers);
+router.patch("/update", Auth, controller.updateUser);
 
 /** POST */
+router.post("/admin/get-users", Auth, controller.getAllUsers);
 router.post("/getAllFollowing", Auth, controller.getAllFollowing);
 router.post("/getAllFollower", Auth, controller.getAllFollower);
 

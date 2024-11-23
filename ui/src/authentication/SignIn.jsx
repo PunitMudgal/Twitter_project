@@ -28,10 +28,7 @@ function SignIn() {
         success: "Login Success",
         error: "Login Failed!",
       });
-      loginPromise.then(function (res) {
-        let token = res.data;
-        localStorage.setItem("token", token);
-
+      loginPromise.then(() => {
         navigate("/home");
       });
     },

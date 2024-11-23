@@ -3,41 +3,29 @@ import { getUserFromToken } from "./helper.js";
 import { useEffect, useMemo, useState } from "react";
 import { setFriendProfile, setUser } from "../store/authSlice.js";
 import axios from "axios";
-
-axios.defaults.baseURL = "http://localhost:1414";
+import { axiosInstance } from "./axios.js";
 
 export default function useFetchHook(query) {
   const dispatch = useDispatch();
-  // Memoize token to prevent recomputation on every render
-  const token = useMemo(() => localStorage.getItem("token"), []);
-  // const token = localStorage.getItem("token");
 
   const [getData, setData] = useState({
     isLoading: false,
-    status: null,
     serverError: null,
   });
 
   useEffect(() => {
-    console.log("useEffect called");
     const fetchData = async () => {
       try {
         setData((prev) => ({ ...prev, isLoading: true }));
 
-        const endpoint = query
-          ? `/user/${query}`
-          : `/user/${await getUserIdFromToken()}`;
-        const { data, status } = await axios.get(endpoint, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const { data, status } = await axiosInstance.get(`/user/${query}`);
 
         if (status === 200) {
           setData((prev) => ({
             ...prev,
             isLoading: false,
-            status,
           }));
-          !query ? dispatch(setUser(data)) : dispatch(setFriendProfile(data));
+          dispatch(setFriendProfile(data));
         }
       } catch (error) {
         setData((prev) => ({
@@ -50,14 +38,8 @@ export default function useFetchHook(query) {
       }
     };
 
-    token && fetchData();
-  }, [token, query, dispatch]);
+    fetchData();
+  }, [query, dispatch]);
 
   return [getData, setData];
 }
-
-// Mock function to simulate getting user ID from token
-const getUserIdFromToken = async () => {
-  const { userId } = await getUserFromToken();
-  return userId;
-};

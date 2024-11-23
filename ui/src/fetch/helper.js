@@ -1,163 +1,121 @@
-import axios from "axios";
-import { jwtDecode } from "jwt-decode";
-
-axios.defaults.baseURL = "http://localhost:1414";
-
-export async function getUserFromToken() {
-  const token = localStorage.getItem("token");
-  if (!token) return Promise.reject("Token not found!");
-  let decode = jwtDecode(token);
-  return decode;
-}
+import toast from "react-hot-toast";
+import { axiosInstance } from "./axios";
 
 /** --------- USER --------------- */
 
 /** REGISTER USER */
 export async function registerUser(userData) {
   try {
-    const response = await axios.post(`/auth/register`, userData);
+    const response = await axiosInstance.post(`/auth/register`, userData);
     return response;
   } catch (error) {
-    return Promise.reject({ error });
+    toast.error(error.response.data.message);
   }
 }
 
 /** LOGIN USER */
 export async function loginUser({ emailOrUsername, password }) {
   try {
-    const { data } = await axios.post("/auth/login", {
+    const { data } = await axiosInstance.post("/auth/login", {
       emailOrUsername,
       password,
     });
     return Promise.resolve({ data });
   } catch (error) {
-    return Promise.reject({ error: "Wrong Credentials" });
+    toast.error(error.response.data.message);
+  }
+}
+
+export async function Logout() {
+  try {
+    await axiosInstance.get("/auth/logout");
+    toast.success("Logout Successfully");
+  } catch (error) {
+    toast.error(error.response.data.message);
   }
 }
 
 /** SEARCH USER */
-export async function searchUser(name, token) {
+export async function searchUser(name) {
   try {
-    const { data } = await axios.get(`/user/search/${name}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const { data } = await axiosInstance.get(`/user/search/${name}`);
     console.log("data in seacth funciton ", data);
     return data;
-  } catch (error) {}
+  } catch (error) {
+    toast.error(error.response.data.message);
+  }
 }
 
 /** UPDATE USER */
-export async function updateUser(values, token) {
+export async function updateUser(values) {
   try {
-    await axios.patch("/user/update", values, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    await axiosInstance.patch("/user/update", values);
     return;
   } catch (error) {
     console.error("error response", error);
-    throw new Error("Wrong Credentials");
+    toast.error(error.response.data.message);
   }
 }
 
 // follow user
-export async function follow(userId, friendId, token) {
+export async function follow(userId, friendId) {
   try {
-    const { data } = await axios.put(
-      `/user/${friendId}/follow`,
-      { userId },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    console.log("msg", data.message);
+    const { data } = await axiosInstance.put(`/user/${friendId}/follow`, {
+      userId,
+    });
     return data;
   } catch (error) {
-    throw new Error(error.response?.data?.message);
+    toast.error(error.response.data.message);
   }
 }
 
 // unfollow user
-export async function unfollow(userId, friendId, token) {
+export async function unfollow(userId, friendId) {
   try {
-    const { message } = await axios.put(
-      `/user/${friendId}/unfollow`,
-      { userId },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    return message;
+    const { data } = await axiosInstance.put(`/user/${friendId}/unfollow`, {
+      userId,
+    });
+    return data;
   } catch (error) {
-    throw new Error(
-      error.response?.data?.message ||
-        "An error occurred while following the user."
-    );
+    toast.error(error.response.data.message);
   }
 }
 
 // get Friends suggestion
-export async function getFriendSuggestion(token) {
+export async function getFriendSuggestion() {
   try {
-    const { data } = await axios.post(
-      `user/suggestFriends`,
-      {},
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const { data } = await axiosInstance.post(`/user/suggestFriends`, {});
     return data;
   } catch (error) {
-    throw new Error("Wrong credentials", error);
+    toast.error(error.response.data.message);
   }
 }
 
 // Fetch User's friends
-export async function getAllFollowing(following, token) {
-  if (following && token) {
+export async function getAllFollowing(following) {
+  if (following) {
     try {
-      const { data } = await axios.post(
-        `user/getAllFollowing`,
-        { following },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const { data } = await axiosInstance.post(`/user/getAllFollowing`, {
+        following,
+      });
       return data;
     } catch (error) {
-      throw new Error("Wrong Credentials");
+      toast.error(error.response.data.message);
     }
   } else {
     throw new Error("Following list or token is missing");
   }
 }
 
-export async function getAllFollower(follower, token) {
-  if (follower && token) {
+export async function getAllFollower(follower) {
+  if (follower) {
     try {
-      const { data } = await axios.post(
-        `user/getAllFollower`,
-        { follower },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const { data } = await axiosInstance.post(`/user/getAllFollower`, {
+        follower,
+      });
       return data;
     } catch (error) {
-      throw new Error("Wrong Credentials");
+      toast.error(error.response.data.message);
     }
   } else {
     throw new Error("follower list or token is missing");
@@ -166,134 +124,94 @@ export async function getAllFollower(follower, token) {
 
 /** --------- POSTS  --------------- */
 
-export async function createPost(values, token) {
+export async function createPost(values) {
   try {
-    const { data } = await axios.post(`/post`, values, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const { data } = await axiosInstance.post(`/post`, values);
     console.log("data after creating post", data);
   } catch (error) {
-    throw new Error("Error while creating post");
+    toast.error(error.response.data.message);
   }
 }
 
 /** */
-export async function getFriendPosts(userId, token, page) {
+export async function getFriendPosts(userId, page) {
   try {
-    const { data } = await axios.get(`/post/${userId}/posts`, {
+    const { data } = await axiosInstance.get(`/post/${userId}/posts`, {
       params: { page, limit: 4 },
-
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
     });
     return data;
   } catch (error) {
-    throw new Error("Error while fetching user post");
+    toast.error(error.response.data.message);
   }
 }
 
 export async function getFeedPosts(page) {
   try {
-    const { data } = await axios.get(
+    const { data } = await axiosInstance.get(
       `/post/foryou/getAll?page=${page}&limit=5`
     );
     return data;
   } catch (error) {
-    throw new Error("Error while fetching feed post");
+    toast.error(error.response.data.message);
   }
 }
 
-export async function getFollowingPosts(page, userId, token) {
+export async function getFollowingPosts(page, userId) {
   try {
-    const { data } = await axios.get(
-      `/post/following/${userId}?page=${page}&limit=5`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
+    const { data } = await axiosInstance.get(
+      `/post/following/${userId}?page=${page}&limit=5`
     );
     return data;
   } catch (error) {
-    throw new Error("Error while fetching feed post");
+    toast.error(error.response.data.message);
   }
 }
 
-export async function likeUnlikePost(postId, userId, token) {
+export async function likeUnlikePost(postId, userId) {
   try {
-    const { data } = await axios.patch(
-      `/post/${postId}/like`,
-      { userId },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const { data } = await axiosInstance.patch(`/post/${postId}/like`, {
+      userId,
+    });
     return data;
   } catch (error) {
-    throw new Error("Error while liking post");
+    toast.error(error.response.data.message);
   }
 }
 
-export async function bookmarkPost(postId, userId, token) {
+export async function bookmarkPost(postId, userId) {
   try {
-    await axios.patch(
-      `/post/bookmark/${postId}`,
-      { userId },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    await axiosInstance.patch(`/post/bookmark/${postId}`, { userId });
     return;
-  } catch (err) {
-    throw new Error("Error while saving (bookmark) post");
+  } catch (error) {
+    toast.error(error.response.data.message);
   }
 }
 
-export async function deletePost(postId, userId, token) {
+export async function deletePost(postId, userId) {
   try {
-    await axios.delete(`/post/${postId}/delete`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+    await axiosInstance.delete(`/post/${postId}/delete`, {
       data: { userId },
     });
     return;
   } catch (error) {
-    throw new Error("Error while deleting post");
+    toast.error(error.response.data.message);
   }
 }
 
 /** ADMIN DASHBOARD */
-export async function getAllUsers(token) {
+export async function getAllUsers() {
   try {
-    const { data } = await axios.post(
-      `/user/admin/get-users`,
-      {},
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const { data } = await axiosInstance.post(`/user/admin/get-users`);
     return data;
-  } catch (error) {}
+  } catch (error) {
+    toast.error(error.response.data.message);
+  }
 }
 
-export async function deleteUser(userId, token) {
+export async function deleteUser(userId) {
   try {
-    await axios.delete(`/user/deleteUser/${userId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    await axiosInstance.delete(`/user/deleteUser/${userId}`);
   } catch (error) {
-    throw new Error("Error while deleting user");
+    toast.error(error.response.data.message);
   }
 }

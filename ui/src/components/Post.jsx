@@ -36,18 +36,18 @@ function Post({
   const currentUserId = useSelector((state) => state.auth?.user?._id);
   const isAdmin = useSelector((state) => state.auth?.user?.isAdmin);
   let isSelf = currentUserId === userId;
-  const token = localStorage.getItem("token");
+
   const navigate = useNavigate();
   const isLiked = Boolean(likes[currentUserId]);
 
   const likeUnlikeHandle = async () => {
-    const { post } = await likeUnlikePost(_id, currentUserId, token);
+    const { post } = await likeUnlikePost(_id, currentUserId);
     setLikes(post.likes);
   };
 
   const handleDelete = async () => {
     try {
-      const deletePromise = deletePost(_id, currentUserId, token);
+      const deletePromise = deletePost(_id, currentUserId);
       await toast.promise(deletePromise, {
         loading: "Deleting Post...",
         success: "Post deleted",
@@ -63,7 +63,7 @@ function Post({
 
   const handleBookmark = async () => {
     try {
-      const bookmarkPromise = bookmarkPost(_id, currentUserId, token);
+      const bookmarkPromise = bookmarkPost(_id, currentUserId);
       await toast.promise(bookmarkPromise, {
         loading: "Loading...",
         success: "Post Saved",

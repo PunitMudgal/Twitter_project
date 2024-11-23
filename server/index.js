@@ -1,19 +1,22 @@
-import path from "path";
 import cors from "cors";
-import helmet from "helmet";
+import path from "path";
 import multer from "multer";
 import morgan from "morgan";
 import dotenv from "dotenv";
+import helmet from "helmet";
 import express from "express";
-import bodyParser from "body-parser";
 import { fileURLToPath } from "url";
-import connectDb from "./dbConnection.js";
+import bodyParser from "body-parser";
+import Auth from "./middleware/auth.js";
+import cookieParser from "cookie-parser";
 import authRoutes from "./router/auth.js";
 import userRoutes from "./router/user.js";
 import postRouter from "./router/post.js";
-import Auth from "./middleware/auth.js";
+import connectDb from "./lib/dbConnection.js";
+import messageRouter from "./router/message.js";
 import { updateUser } from "./controllers/user.js";
 import { createPost } from "./controllers/post.js";
+import conversationRouter from "./router/conversation.js";
 
 dotenv.config();
 const app = express();
@@ -22,7 +25,13 @@ const app = express();
 app.use(express.json({ extended: false, limit: "50mb" }));
 app.use(helmet());
 app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:3000", // Frontend URL
+    credentials: true,
+  })
+);
+app.use(cookieParser());
 app.use(bodyParser.json({ limit: "30mb", extended: true }));
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 app.use(morgan("common"));
@@ -43,21 +52,23 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 /** ROUTES WITH FILES */
-app.patch(
-  "/user/update",
-  Auth,
-  upload.fields([
-    { name: "picture", maxCount: 1 }, // Accept profile photo
-    { name: "backgroundPhoto", maxCount: 1 }, // Accept background photo
-  ]),
-  updateUser
-);
+// app.patch(
+//   "/user/update",
+//   Auth,
+//   upload.fields([
+//     { name: "picture", maxCount: 1 }, // Accept profile photo
+//     { name: "backgroundPhoto", maxCount: 1 }, // Accept background photo
+//   ]),
+//   updateUser
+// );
 app.post("/post", Auth, upload.single("picture"), createPost);
 
 // ROUTES
 app.use("/auth", authRoutes);
 app.use("/user", userRoutes);
 app.use("/post", postRouter);
+app.use("/conversation", conversationRouter);
+app.use("/message", messageRouter);
 
 // DATABASE SETUP
 const port = process.env.PORT || 8080;

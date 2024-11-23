@@ -1,4 +1,6 @@
+import mongoose from "mongoose";
 import User from "../models/User.js";
+import Post from "../models/Post.js";
 
 /** GET USER  /user/:id */
 export const getUser = async (req, res) => {
@@ -41,7 +43,7 @@ export const followUser = async (req, res) => {
       if (!user.follower.includes(req.body.userId)) {
         await user.updateOne({ $push: { follower: req.body.userId } });
         await currentUser.updateOne({ $push: { following: req.params.id } });
-        return res.status(200).json({ message: "User has been followed" });
+        return res.status(200).json(user);
       } else {
         return res
           .status(403)
@@ -66,7 +68,7 @@ export const unfollowUser = async (req, res) => {
       if (user.follower.includes(req.body.userId)) {
         await user.updateOne({ $pull: { follower: req.body.userId } });
         await currentUser.updateOne({ $pull: { following: req.params.id } });
-        return res.status(200).json({ message: "user has been unfollowed" });
+        return res.status(200).json(user);
       } else {
         return res.status(403).json({ message: "you don't follow this user" });
       }
@@ -81,9 +83,8 @@ export const unfollowUser = async (req, res) => {
 /** UPDATE USER /updateUser */
 export const updateUser = async (req, res) => {
   try {
-    if (req.body.userId === req.user.userId || req.body.isAdmin) {
+    if (req.body.userId === req.user.userId || req.user.isAdmin) {
       const body = req.body;
-
       // handling file uploads
       const picture = req.files["picture"] ? req.files["picture"][0] : null;
       const backgroundPhoto = req.files["backgroundPhoto"]
@@ -108,8 +109,8 @@ export const updateUser = async (req, res) => {
 
 export const getFriendSuggestions = async (req, res) => {
   try {
-    const { userId } = req.user;
-    console.log(req.user);
+    const { _id: userId } = req.user;
+
     const currentUser = await User.findById(userId).select("following").lean();
 
     const followingList = currentUser.following || [];
@@ -164,21 +165,38 @@ export const getAllFollower = async (req, res) => {
 // delete -> /deleteUser/:userId
 export const deleteUser = async (req, res) => {
   const { userId } = req.params;
-  const { userId: loggedInUserId, isAdmin } = req.user;
+  if (!req.user) {
+    return res.status(401).json("Unauthorized");
+  }
+
+  const { _id: loggedInUserId, isAdmin } = req.user;
   if (userId === loggedInUserId || isAdmin) {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
     try {
-      const deleteUser = await User.findByIdAndDelete(userId);
-      if (!deleteUser) return res.status(404).json("User not found");
+      const deletedUser = await User.findByIdAndDelete(userId).session(session);
+      if (!deletedUser) {
+        await session.abortTransaction();
+        return res.status(404).json("User not found");
+      }
 
       await User.updateMany(
         { following: userId },
-        { $pull: { following: userId } }
+        { $pull: { following: userId } },
+        { session }
       );
 
-      await Post.deleteMany({ userId });
+      await Post.deleteMany({ userId }).session(session);
+
+      await session.commitTransaction();
       res.status(200).json("Account deleted successfully");
     } catch (err) {
-      return res.status(500).json(err);
+      await session.abortTransaction();
+      console.error("Error during user deletion:", err.message);
+      res.status(500).json({ message: "Internal server error" });
+    } finally {
+      session.endSession();
     }
   } else {
     return res.status(403).json("You can only delete your account!");
@@ -186,7 +204,7 @@ export const deleteUser = async (req, res) => {
 };
 
 export const getAllUsers = async (req, res) => {
-  const { userId } = req.user;
+  const { _id } = req.user;
   try {
     const users = await User.find({ _id: { $ne: userId } })
       .select("name username profilePicturePath isAdmin _id")
@@ -196,3 +214,29 @@ export const getAllUsers = async (req, res) => {
     res.status(500).json({ message: "Failed to fetch users data", error });
   }
 };
+
+// export const updateUser = async (req, res) => {
+//   try {
+//     if (req.body.userId === req.user.userId || req.user.isAdmin) {
+//       const body = req.body;
+//       // handling file uploads
+//       const picture = req.files["picture"] ? req.files["picture"][0] : null;
+//       const backgroundPhoto = req.files["backgroundPhoto"]
+//         ? req.files["backgroundPhoto"][0]
+//         : null;
+
+//       // if files are uploaded, include them in the update body
+//       if (picture) body.picture = `/assets/${picture.filename}`;
+//       if (backgroundPhoto)
+//         body.backgroundPhoto = `/assets/${backgroundPhoto.filename}`;
+
+//       //update user
+//       const updateInfo = await User.updateOne({ _id: req.body.userId }, body);
+//       if (updateInfo.modifiedCount > 0)
+//         return res.status(201).send({ msg: "record updated!", updateInfo });
+//       else return res.status(401).send({ error: "couldn't update user info" });
+//     } else return res.status(401).send({ error: "user not authorized!" });
+//   } catch (error) {
+//     return res.status(501).send({ error });
+//   }
+// };
