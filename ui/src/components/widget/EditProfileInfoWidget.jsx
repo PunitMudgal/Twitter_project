@@ -52,9 +52,17 @@ function EditProfileInfoWidget() {
       name && formData.append("name", name);
       bio && formData.append("bio", bio);
       location && formData.append("from", location);
-      if (coverPicture !== null) {
-        formData.append("backgroundPhoto", coverPicture);
-        formData.append("coverPicture", coverPicture?.name);
+
+      if (coverPicture) {
+        const reader = new FileReader();
+        await new Promise((resolve, reject) => {
+          reader.onload = () => {
+            formData.append("coverPicture", reader.result);
+            resolve();
+          };
+          reader.onerror = (error) => reject(error);
+          reader.readAsDataURL(coverPicture);
+        });
       }
       if (profilePicturePath) {
         formData.append("picture", profilePicturePath);
