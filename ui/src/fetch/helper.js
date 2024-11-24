@@ -48,12 +48,17 @@ export async function searchUser(name) {
 
 /** UPDATE USER */
 export async function updateUser(values) {
+  console.log("values", values);
   try {
-    await axiosInstance.patch("/user/update", values);
-    return;
+    const { data } = await axiosInstance.patch("/user/update", values, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    console.log("data", data);
+
+    return data;
   } catch (error) {
     console.error("error response", error);
-    toast.error(error.response.data.message);
+    // toast.error(error.response.data.message);
   }
 }
 

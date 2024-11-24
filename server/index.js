@@ -34,6 +34,7 @@ app.use(
 app.use(cookieParser());
 app.use(bodyParser.json({ limit: "30mb", extended: true }));
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
+app.use(express.json({ limit: "10mb" })); // To handle Base64 strings
 app.use(morgan("common"));
 app.disable("x-powered-by");
 const __filename = fileURLToPath(import.meta.url);
@@ -56,8 +57,8 @@ const upload = multer({ storage });
 //   "/user/update",
 //   Auth,
 //   upload.fields([
-//     { name: "picture", maxCount: 1 }, // Accept profile photo
-//     { name: "backgroundPhoto", maxCount: 1 }, // Accept background photo
+//     { name: "profilePicturePath", maxCount: 1 }, // Accept profile photo
+//     { name: "coverPicture", maxCount: 1 }, // Accept background photo
 //   ]),
 //   updateUser
 // );

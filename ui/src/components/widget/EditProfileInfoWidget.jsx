@@ -7,11 +7,12 @@ import { MdOutlineAddAPhoto } from "react-icons/md";
 import { useSelector } from "react-redux";
 import defaultPhoto from "../../assets/profile.png";
 import { Box, TextField } from "@mui/material";
+import { selectUser } from "../../store/authSlice";
+import { axiosInstance } from "../../fetch/axios";
 
 function EditProfileInfoWidget() {
   const navigate = useNavigate();
-
-  const UserProfile = useSelector((state) => state.auth.friendProfile);
+  const user = useSelector(selectUser);
 
   const [profilePicturePath, setProfilePicturePath] = useState(null);
   const [previewProfile, setPreviewProfile] = useState(null);
@@ -19,9 +20,9 @@ function EditProfileInfoWidget() {
   const [coverPicture, setCoverPicture] = useState(null);
   const [previewBg, setPreviewBg] = useState(null);
 
-  const [name, setName] = useState(UserProfile?.name);
-  const [bio, setBio] = useState(UserProfile?.bio);
-  const [location, setLocation] = useState(UserProfile?.from);
+  const [name, setName] = useState("");
+  const [bio, setBio] = useState("");
+  const [location, setLocation] = useState("");
 
   const backgroundPhotoHandleChange = (e) => {
     const file = e.target.files[0];
@@ -41,45 +42,65 @@ function EditProfileInfoWidget() {
 
   const handleRemoveBg = () => {
     setPreviewBg(null);
-    setCoverPicture("");
+    setCoverPicture(null);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const formData = new FormData();
-      formData.append("userId", UserProfile?._id);
-      name && formData.append("name", name);
-      bio && formData.append("bio", bio);
-      location && formData.append("from", location);
+      // Prepare data object
+      const data = {
+        userId: user._id,
+        name: name || user.name,
+        bio: bio || user.bio,
+        from: location || user.from,
+        coverPicture: null,
+        profilePicturePath: null,
+      };
 
+      // Convert images to Base64 if they exist
       if (coverPicture) {
         const reader = new FileReader();
         await new Promise((resolve, reject) => {
           reader.onload = () => {
-            formData.append("coverPicture", reader.result);
+            data.coverPicture = reader.result; // Base64 encoded string
             resolve();
           };
           reader.onerror = (error) => reject(error);
           reader.readAsDataURL(coverPicture);
         });
       }
+
       if (profilePicturePath) {
-        formData.append("picture", profilePicturePath);
-        formData.append("profilePicturePath", profilePicturePath?.name);
+        const reader = new FileReader();
+        await new Promise((resolve, reject) => {
+          reader.onload = () => {
+            data.profilePicturePath = reader.result; // Base64 encoded string
+            resolve();
+          };
+          reader.onerror = (error) => reject(error);
+          reader.readAsDataURL(profilePicturePath);
+        });
       }
 
-      const updatePromise = updateUser(formData);
-      toast.promise(updatePromise, {
-        loading: "Updating Please wait...",
-        success: "Update successful",
-        error: "Update Error",
-      });
-      updatePromise.then(() => {
-        navigate(-1);
-      });
+      // Debugging: Log the data object
+      console.log("Data being sent:", JSON.stringify(data, null, 2));
+
+      // Send the data
+      const response = await axiosInstance.patch("/user/update", data);
+
+      // Handle the response
+      if (response.ok) {
+        console.log("Update successful:", response.data);
+        toast.success("Update successful!");
+        navigate(-1); // Navigate back
+      } else {
+        console.error("Update failed:");
+        toast.error("Update failed, please try again.");
+      }
     } catch (error) {
-      toast.error("Registration Failed. Please try again later."); // Fallback for other errors
+      console.error("Error During Update:", error);
+      toast.error("Update failed, please try again.");
     }
   };
 
@@ -143,7 +164,7 @@ function EditProfileInfoWidget() {
                     <MdOutlineAddAPhoto />
                   </label>
                   {previewBg ||
-                    (UserProfile?.coverPicture && (
+                    (user?.coverPicture && (
                       <RxCross1
                         onClick={handleRemoveBg}
                         className="p-1 text-5xl rounded-full bg-gray-700 bg-opacity-45 hover:bg-opacity-75"
@@ -160,12 +181,9 @@ function EditProfileInfoWidget() {
               </>
               {/* showing bg imgage */}
               {previewBg ||
-                (UserProfile?.coverPicture && (
+                (user?.coverPicture && (
                   <img
-                    src={
-                      previewBg ||
-                      `http://localhost:1414/assets/${UserProfile?.coverPicture}`
-                    }
+                    src={previewBg || user.coverPicture}
                     className="w-full h-full object-cover  "
                     alt="avatar"
                   />
@@ -182,11 +200,7 @@ function EditProfileInfoWidget() {
                 <img
                   className="h-full w-full object-cover "
                   src={
-                    previewProfile
-                      ? previewProfile
-                      : UserProfile?.profilePicturePath
-                      ? `http://localhost:1414/assets/${UserProfile?.profilePicturePath}`
-                      : defaultPhoto
+                    previewProfile || user.profilePicturePath || defaultPhoto
                   }
                   alt="profile"
                 />
@@ -206,7 +220,7 @@ function EditProfileInfoWidget() {
                 variant="outlined"
                 name="name"
                 onChange={(e) => setName(e.target.value)}
-                values={name}
+                value={name}
               />
 
               <TextField
@@ -214,7 +228,7 @@ function EditProfileInfoWidget() {
                 label="Bio"
                 name="bio"
                 onChange={(e) => setBio(e.target.value)}
-                values={bio}
+                value={bio}
                 multiline
                 rows={4}
                 variant="outlined"
@@ -224,7 +238,7 @@ function EditProfileInfoWidget() {
                 label="Location"
                 name="from"
                 onChange={(e) => setLocation(e.target.value)}
-                values={location}
+                value={location}
                 variant="outlined"
               />
             </div>
@@ -236,3 +250,11 @@ function EditProfileInfoWidget() {
 }
 
 export default EditProfileInfoWidget;
+
+// src={
+//   previewProfile
+//     ? previewProfile
+//     : user?.profilePicturePath
+//     ? `http://localhost:1414/assets/${user?.profilePicturePath}`
+//     : defaultPhoto
+// }

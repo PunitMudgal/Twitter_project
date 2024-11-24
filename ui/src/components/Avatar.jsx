@@ -8,11 +8,7 @@ function Avatar({ profilePhoto, userId }) {
   return (
     <img
       onClick={() => navigate(`/home/${userId}`)}
-      src={
-        profilePhoto
-          ? `http://localhost:1414/assets/${profilePhoto}`
-          : defaultPhoto
-      }
+      src={profilePhoto || defaultPhoto}
       alt="avatar"
       className="h-12 w-12 rounded-full object-cover cursor-pointer"
     />

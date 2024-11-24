@@ -142,11 +142,7 @@ function Profile() {
             navigate(profilePicturePath && `/${id}/photo/${profilePicturePath}`)
           }
           className="absolute top-[16%] left-4 h-36 w-36  object-cover border-4 border-gray-900 rounded-full transition-transform duration-300 ease-in-out transform hover:scale-105 hover:border-2 cursor-pointer"
-          src={
-            profilePicturePath
-              ? `http://localhost:1414/assets/${profilePicturePath}`
-              : defaultPhoto
-          }
+          src={profilePicturePath || defaultPhoto}
           alt="profile"
         />
 

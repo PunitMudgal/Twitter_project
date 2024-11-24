@@ -25,9 +25,17 @@ function RegisterProfileCard() {
       formData.append("userId", user._id);
       formData.append("name", name);
       if (image) {
-        formData.append("picture", image);
-        formData.append("profilePicturePath", image.name);
+        const reader = new FileReader();
+        await new Promise((resolve, reject) => {
+          reader.onload = () => {
+            formData.append("profilePicturePath", reader.result);
+            resolve();
+          };
+          reader.onerror = (error) => reject(error);
+          reader.readAsDataURL(image);
+        });
       }
+
       const updatePromise = updateUser(formData);
       toast.promise(updatePromise, {
         loading: "Updating Please wait...",
