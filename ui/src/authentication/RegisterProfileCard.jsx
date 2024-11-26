@@ -25,15 +25,7 @@ function RegisterProfileCard() {
       formData.append("userId", user._id);
       formData.append("name", name);
       if (image) {
-        const reader = new FileReader();
-        await new Promise((resolve, reject) => {
-          reader.onload = () => {
-            formData.append("profilePicturePath", reader.result);
-            resolve();
-          };
-          reader.onerror = (error) => reject(error);
-          reader.readAsDataURL(image);
-        });
+        formData.append("profilePicturePath", image);
       }
 
       const updatePromise = updateUser(formData);

@@ -4,9 +4,9 @@ import Auth from "../middleware/auth.js";
 
 const router = express.Router();
 
-router.get("/:userId/posts", Auth, controller.getUserPosts);
 router.get("/foryou/getAll", controller.getFeedPosts);
-router.get("/following/:userId", Auth, controller.getFollowingPosts);
+router.get("/:userId/posts", Auth, controller.getUserPosts);
+router.get("/get-following-posts", Auth, controller.getFollowingPosts);
 router.get("/get-bookmared-posts", Auth, controller.getBookmarkedPosts);
 
 /**UPDATE */

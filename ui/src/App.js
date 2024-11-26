@@ -20,6 +20,7 @@ const ViewPhoto = lazy(() => import("./components/ViewPhoto"));
 const EditProfileInfoWidget = lazy(() =>
   import("./components/widget/EditProfileInfoWidget")
 );
+const BookmarkPage = lazy(() => import("./pages/BookmarkPage"));
 const FollowerAndFollowing = lazy(() =>
   import("./components/widget/FollowerAndFollowing")
 );
@@ -78,6 +79,10 @@ function App() {
         {
           path: ":id/follower&following",
           element: <FollowerAndFollowing />,
+        },
+        {
+          path: "bookmark",
+          element: <BookmarkPage />,
         },
       ],
     },

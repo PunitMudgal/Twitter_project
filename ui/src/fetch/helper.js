@@ -39,7 +39,6 @@ export async function Logout() {
 export async function searchUser(name) {
   try {
     const { data } = await axiosInstance.get(`/user/search/${name}`);
-    console.log("data in seacth funciton ", data);
     return data;
   } catch (error) {
     toast.error(error.response.data.message);
@@ -48,17 +47,12 @@ export async function searchUser(name) {
 
 /** UPDATE USER */
 export async function updateUser(values) {
-  console.log("values", values);
   try {
-    const { data } = await axiosInstance.patch("/user/update", values, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-    console.log("data", data);
-
+    const { data } = await axiosInstance.patch("/user/update", values);
     return data;
   } catch (error) {
     console.error("error response", error);
-    // toast.error(error.response.data.message);
+    toast.error(error.response.data.message);
   }
 }
 
@@ -132,7 +126,7 @@ export async function getAllFollower(follower) {
 export async function createPost(values) {
   try {
     const { data } = await axiosInstance.post(`/post`, values);
-    console.log("data after creating post", data);
+    return data;
   } catch (error) {
     toast.error(error.response.data.message);
   }
@@ -161,10 +155,10 @@ export async function getFeedPosts(page) {
   }
 }
 
-export async function getFollowingPosts(page, userId) {
+export async function getFollowingPosts(page) {
   try {
     const { data } = await axiosInstance.get(
-      `/post/following/${userId}?page=${page}&limit=5`
+      `/post/get-following-posts?page=${page}&limit=5`
     );
     return data;
   } catch (error) {
@@ -183,10 +177,19 @@ export async function likeUnlikePost(postId, userId) {
   }
 }
 
-export async function bookmarkPost(postId, userId) {
+export async function bookmarkPost(postId) {
   try {
-    await axiosInstance.patch(`/post/bookmark/${postId}`, { userId });
+    await axiosInstance.patch(`/post/bookmark/${postId}`);
     return;
+  } catch (error) {
+    toast.error(error.response.data.message);
+  }
+}
+
+export async function getBookmarkedPosts() {
+  try {
+    const { data } = await axiosInstance.get(`/post/get-bookmared-posts`);
+    return data;
   } catch (error) {
     toast.error(error.response.data.message);
   }

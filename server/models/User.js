@@ -30,7 +30,8 @@ const UserScheme = new mongoose.Schema(
       default: [],
     },
     following: {
-      type: Array,
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "User",
       default: [],
     },
     profilePicturePath: {
@@ -42,7 +43,8 @@ const UserScheme = new mongoose.Schema(
       default: "",
     },
     bookmark: {
-      type: Array,
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "Post",
       default: [],
     },
     isAdmin: {

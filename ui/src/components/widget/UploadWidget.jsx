@@ -14,7 +14,7 @@ import { createPost } from "../../fetch/helper";
 import toast from "react-hot-toast";
 import { selectUser } from "../../store/authSlice";
 
-function UploadWidget() {
+function UploadWidget({ setPosts }) {
   const user = useSelector(selectUser);
 
   const { _id, profilePicturePath } = user;
@@ -23,25 +23,39 @@ function UploadWidget() {
   const [photo, setPhoto] = useState(null);
   const [prevPhoto, setPrevPhoto] = useState(null);
 
+  const postPhotoHandle = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setPhoto(file);
+      setPrevPhoto(URL.createObjectURL(file));
+    }
+  };
+
   const handleUpload = async (e) => {
     e.preventDefault();
     const formData = new FormData();
-    formData.append("userId", _id);
-    formData.append("text", text);
+    if (text) formData.append("text", text);
     if (photo) {
-      formData.append("picture", photo);
-      formData.append("picturePath", photo.name);
+      formData.append("picturePath", photo);
     }
+
+    // Debug: Log FormData
+    for (let pair of formData.entries()) {
+      console.log(pair[0], pair[1]);
+    }
+
     const uploadPromise = createPost(formData);
     toast.promise(uploadPromise, {
-      loading: "upload Please wait...",
-      success: "upload successful",
-      error: "upload Error",
+      loading: "Upload Please Wait...",
+      success: "Upload Successful",
+      error: "Upload Error",
     });
-    await uploadPromise;
-    setPhoto(null);
-    setPrevPhoto(null);
-    setText("");
+    uploadPromise.then((data) => {
+      setPosts((prevPosts) => [data, ...prevPosts]);
+      setPhoto(null);
+      setPrevPhoto(null);
+      setText("");
+    });
   };
 
   return (
@@ -86,10 +100,7 @@ function UploadWidget() {
             type="file"
             id="photo"
             style={{ display: "none" }}
-            onChange={(e) => {
-              setPhoto(e.target.files[0]);
-              setPrevPhoto(URL.createObjectURL(e.target.files[0]));
-            }}
+            onChange={postPhotoHandle}
           />
           <MdGif className="border rounded-md border-gray-400" />
           <CgOptions />

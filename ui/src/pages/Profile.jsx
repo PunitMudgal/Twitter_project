@@ -1,4 +1,3 @@
-import axios from "axios";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
@@ -50,7 +49,8 @@ function Profile() {
         `/post/${id}/posts?page=${page}&limit=4`
       );
       if (page === 1) {
-        setFriendPosts(data);
+        setFriendPosts(data.posts);
+        setHasMore(data.hasMore);
       } else {
         setFriendPosts((prevPosts) => [...prevPosts, ...data]);
       }
@@ -130,7 +130,7 @@ function Profile() {
           {coverPicture && (
             <img
               className="h-full w-full object-cover overflow-hidden object-top "
-              src={`http://localhost:1414/assets/${coverPicture}`}
+              src={coverPicture}
               alt="cover"
             />
           )}

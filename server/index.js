@@ -7,6 +7,7 @@ import helmet from "helmet";
 import express from "express";
 import { fileURLToPath } from "url";
 import bodyParser from "body-parser";
+import { uploadPostImage, uploadUserImage } from "./lib/cloudinary.js";
 import Auth from "./middleware/auth.js";
 import cookieParser from "cookie-parser";
 import authRoutes from "./router/auth.js";
@@ -42,27 +43,32 @@ const __dirname = path.dirname(__filename);
 app.use("/assets", express.static(path.join(__dirname, "public/assets")));
 
 /** FILE STORAGE */
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "./public/assets");
-  },
-  filename: (req, file, cb) => {
-    cb(null, file.originalname);
-  },
-});
-const upload = multer({ storage });
+// const storage = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     cb(null, "./public/assets");
+//   },
+//   filename: (req, file, cb) => {
+//     cb(null, file.originalname);
+//   },
+// });
 
 /** ROUTES WITH FILES */
-// app.patch(
-//   "/user/update",
-//   Auth,
-//   upload.fields([
-//     { name: "profilePicturePath", maxCount: 1 }, // Accept profile photo
-//     { name: "coverPicture", maxCount: 1 }, // Accept background photo
-//   ]),
-//   updateUser
-// );
-app.post("/post", Auth, upload.single("picture"), createPost);
+app.patch(
+  "/user/update",
+  Auth,
+  uploadUserImage.fields([
+    { name: "profilePicturePath", maxCount: 1 },
+    { name: "coverPicture", maxCount: 1 },
+  ]),
+  updateUser
+);
+
+app.post(
+  "/post",
+  Auth,
+  uploadPostImage.fields([{ name: "picturePath", maxCount: 1 }]),
+  createPost
+);
 
 // ROUTES
 app.use("/auth", authRoutes);

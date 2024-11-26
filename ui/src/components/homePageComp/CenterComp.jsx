@@ -18,7 +18,7 @@ function CenterComp({ isLoading }) {
   const [postLoading, setPostLoading] = useState(true);
 
   const centerRef = useCenterRef();
-  const loggedInUserId = useSelector((state) => state.auth?.user?._id);
+  const followingUsers = useSelector((state) => state.auth?.user?.following);
 
   const fetchPosts = useCallback(async () => {
     setPostLoading(true);
@@ -26,7 +26,7 @@ function CenterComp({ isLoading }) {
       const fetchMethod =
         activeTab === "For You" ? getFeedPosts : getFollowingPosts;
       const { posts: newPosts, hasMore: morePostsAvailable } =
-        await fetchMethod(page, loggedInUserId);
+        await fetchMethod(page);
 
       setPosts((prevPosts) =>
         page === 1 ? newPosts : [...prevPosts, ...newPosts]
@@ -37,7 +37,7 @@ function CenterComp({ isLoading }) {
     } finally {
       setPostLoading(false);
     }
-  }, [activeTab, page, loggedInUserId]);
+  }, [activeTab, page, followingUsers]);
 
   useEffect(() => {
     fetchPosts();
@@ -73,7 +73,7 @@ function CenterComp({ isLoading }) {
         activeTab={activeTab}
       />
 
-      <UploadWidget />
+      <UploadWidget setPosts={setPosts} />
 
       {isLoading && <Loading />}
       <div className="flex flex-col space-y-4">

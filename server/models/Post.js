@@ -2,16 +2,9 @@ import mongoose from "mongoose";
 
 const postSchema = mongoose.Schema(
   {
-    userId: {
-      type: String,
-      required: true,
-    },
-    username: {
-      type: String,
-      required: true,
-    },
-    name: {
-      type: String,
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
       required: true,
     },
     isQuote: {
@@ -19,8 +12,10 @@ const postSchema = mongoose.Schema(
       default: false,
     },
     text: String,
-    picturePath: String,
-    profilePicturePath: String,
+    picturePath: {
+      type: String,
+      default: "",
+    },
     likes: {
       type: Map,
       of: Boolean,

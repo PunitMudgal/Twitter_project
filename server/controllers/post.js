@@ -3,17 +3,16 @@ import User from "../models/User.js";
 
 export const createPost = async (req, res) => {
   try {
-    const { userId, text, picturePath, isQuote, parentId } = req.body;
-    const user = await User.findById(userId).select(
-      "name username profilePicturePath isAdmin"
-    );
+    const { text, isQuote, parentId } = req.body;
+    const { userId } = req.user;
+    // console.log("files ----", req.files);
+    // console.log("files path ----", req.files["picturePath"][0].path);
+
+    const picturePath = req.files?.["picturePath"]?.[0]?.path || "";
+    console.log("picturepath - -- ", picturePath);
     const newPost = new Post({
-      userId,
-      name: user.name,
-      username: user.username,
-      profilePicturePath: user.profilePicturePath,
-      isAdmin: user.isAdmin,
-      picturePath: picturePath || "",
+      user: userId,
+      picturePath,
       text: text || "",
       likes: {},
       comments: [],
@@ -21,8 +20,16 @@ export const createPost = async (req, res) => {
       parentId: parentId || null,
       isQuote: isQuote || false,
     });
+
     await newPost.save();
-    const post = await Post.find();
+
+    const post = await Post.findById(newPost._id)
+      .populate({
+        path: "user",
+        select: "name username profilePicturePath isAdmin",
+      })
+      .lean();
+
     res.status(201).json(post);
   } catch (error) {
     res.status(409).json({ message: error.message });
@@ -38,6 +45,10 @@ export async function getFeedPosts(req, res) {
     const startIndex = (page - 1) * limit;
 
     const posts = await Post.find()
+      .populate({
+        path: "user",
+        select: "name username profilePicturePath isAdmin",
+      })
       .sort({ createdAt: -1 })
       .skip(startIndex)
       .limit(limit)
@@ -54,23 +65,35 @@ export async function getFeedPosts(req, res) {
 
 export async function getFollowingPosts(req, res) {
   try {
-    const { userId } = req.params;
+    const { userId, following } = req.user;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 5;
     const skip = (page - 1) * limit;
+    console.log("Followings - - - - - - - -", following);
+    const followings = following || [];
+    console.log("Foll - owings - - - - - - - -", followings);
 
     // Fetch user following list
-    const user = await User.findById(userId).select("following").lean();
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
+    // const user = await User.findById(userId).select("following").lean();
+    // if (!user) {
+    //   return res.status(404).json({ message: "User not found" });
+    // }
 
-    const posts = await Post.find({
-      $or: [
-        { userId: { $in: user.following } }, // posts from followed users
-        { userId: userId }, // user's own posts
-      ],
-    })
+    // const posts = await Post.find({
+    //   $or: [
+    //     { userId: { $in: following } }, // posts from followed users
+    //     { userId: userId }, // user's own posts
+    //   ],
+    // })
+    //   .sort({ createdAt: -1 })
+    //   .skip(skip)
+    //   .limit(limit)
+    //   .lean();
+    const posts = await Post.find({ user: { $in: followings } })
+      .populate({
+        path: "user",
+        select: "name username profilePicturePath isAdmin", // Populate user details
+      })
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
@@ -78,7 +101,7 @@ export async function getFollowingPosts(req, res) {
 
     // Count total posts from following list and self
     const totalPosts = await Post.countDocuments({
-      $or: [{ userId: { $in: user.following } }, { userId: userId }],
+      $or: [{ user: { $in: following } }, { user: userId }],
     });
     const hasMore = skip + posts.length < totalPosts;
 
@@ -93,15 +116,25 @@ export async function getUserPosts(req, res) {
   try {
     const { userId } = req.params;
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 4;
+    const limit = parseInt(req.query.limit) || 5;
+    const skip = (page - 1) * limit;
 
-    const posts = await Post.find({ userId })
+    const posts = await Post.find({ user: userId })
+      .populate({
+        path: "user",
+        select: "name username profilePicturePath isAdmin",
+      })
       .sort({ createdAt: -1 }) // Sort by most recent
-      .skip((page - 1) * limit) // Implement pagination
+      .skip(skip) // Implement pagination
       .limit(limit) // Limit the number of posts per page
       .lean(); // Optimize performance with lean()
 
-    res.status(200).json(posts);
+    const totalPosts = await Post.countDocuments({ user: userId });
+
+    // Determine if there are more posts to fetch
+    const hasMore = skip + posts.length < totalPosts;
+
+    res.status(200).json({ posts, hasMore });
   } catch (error) {
     res.status(404).json({ message: error.message });
   }
@@ -131,7 +164,7 @@ export async function likePost(req, res) {
 
 export async function bookmarkPost(req, res) {
   const { postId } = req.params;
-  const { userId } = req.body;
+  const { userId } = req.user;
 
   try {
     const user = await User.findById(userId);
@@ -153,29 +186,21 @@ export async function bookmarkPost(req, res) {
   }
 }
 
-// export async function getBookmarkedPosts(req, res) {
-//   const { userId } = req.params;
-//   try {
-//     const user = await User.findById(userId).select("bookmark").lean();
-//     if (!user) {
-//       return res.status(404).json({ message: "User not found" });
-//     }
-//     const bookmarkedPosts = await Post.find({
-//       _id: { $in: user.bookmark },
-//     }).lean();
-//     res.status(200).json(bookmarkedPosts);
-//   } catch (error) {
-//     res.status(500).json({ message: "Server error" });
-//   }
-// }
-
 export async function getBookmarkedPosts(req, res) {
-  const { bookmark } = req.body;
+  const { bookmark } = req.user;
   try {
-    const bookmarkedPosts = await Post.find({
-      _id: { $in: bookmark },
-    }).lean();
-    res.status(200).json(bookmarkedPosts);
+    if (bookmark.length === 0) {
+      return res.status(200).json({ message: "No Bookmared Posts" });
+    }
+
+    const posts = await Post.find({ _id: { $in: bookmark } })
+      .populate({
+        path: "user",
+        select: "name username profilePicturePath isAdmin",
+      })
+      .sort({ createdAt: -1 })
+      .lean();
+    res.status(200).json(posts);
   } catch (error) {
     res.status(500).json({ message: "Server error" });
   }
@@ -183,7 +208,7 @@ export async function getBookmarkedPosts(req, res) {
 
 export async function deletePost(req, res) {
   const { postId } = req.params;
-  const { userId } = req.body;
+  const { userId, isAdmin } = req.user;
 
   try {
     // Validate if the post exists
@@ -192,18 +217,14 @@ export async function deletePost(req, res) {
       return res.status(404).json({ message: "Post not found" });
     }
 
-    if (post.userId === userId) {
-      await post.deleteOne();
-      return res.status(200).json({ message: "Post deleted" });
+    if (post.user.toString() !== userId && !isAdmin) {
+      return res
+        .status(403)
+        .json({ message: "You are not authorized to delete this post" });
     }
 
-    const user = await User.findById(userId);
-    if (user && user.isAdmin) {
-      await post.deleteOne();
-      return res.status(200).json({ message: "Post deleted" });
-    }
-
-    res.status(403).json({ message: "Unauthorized" });
+    await Post.findByIdAndDelete(postId);
+    return res.status(200).json({ message: "Post deleted", post });
   } catch (error) {
     res.status(500).json({ message: "Server error" });
   }

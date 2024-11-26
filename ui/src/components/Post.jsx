@@ -3,24 +3,22 @@ import Avatar from "./Avatar";
 import { FcLike } from "react-icons/fc";
 import { BiRepost, BiComment } from "react-icons/bi";
 import { MdBarChart, MdOutlineReport, MdOutlineBlock } from "react-icons/md";
-import { GoBookmark, GoHeart } from "react-icons/go";
+import { GoBookmark, GoBookmarkFill, GoHeart } from "react-icons/go";
 import { RiShare2Line, RiDeleteBin6Line } from "react-icons/ri";
+import FilledBookmark from "../assets/bookmarkYellow.png";
+import Bookmark from "../assets/bookmark.png";
 import { CgProfile } from "react-icons/cg";
 import { SlOptions } from "react-icons/sl";
 import { useSelector } from "react-redux";
 import { bookmarkPost, deletePost, likeUnlikePost } from "../fetch/helper";
 import "../style/profile.css";
-import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
 function Post({
   _id,
-  userId,
+  user,
   picturePath,
-  name,
-  username,
-  profilePicturePath,
   likes: initialLikes,
   commentCount,
   createdAt,
@@ -33,12 +31,15 @@ function Post({
   const [likes, setLikes] = useState(initialLikes);
   const menuRef = useRef(null);
 
-  const currentUserId = useSelector((state) => state.auth?.user?._id);
+  const { _id: currentUserId, bookmark } = useSelector(
+    (state) => state.auth?.user
+  );
   const isAdmin = useSelector((state) => state.auth?.user?.isAdmin);
-  let isSelf = currentUserId === userId;
+  let isSelf = currentUserId === user?._id;
 
   const navigate = useNavigate();
   const isLiked = Boolean(likes[currentUserId]);
+  const isBookmarked = Boolean(bookmark.includes(_id));
 
   const likeUnlikeHandle = async () => {
     const { post } = await likeUnlikePost(_id, currentUserId);
@@ -63,10 +64,10 @@ function Post({
 
   const handleBookmark = async () => {
     try {
-      const bookmarkPromise = bookmarkPost(_id, currentUserId);
+      const bookmarkPromise = bookmarkPost(_id);
       await toast.promise(bookmarkPromise, {
         loading: "Loading...",
-        success: "Post Saved",
+        success: "Done",
         error: "Bookmark Failed",
       });
     } catch (error) {}
@@ -79,7 +80,11 @@ function Post({
     { name: "Profile", icon: <CgProfile />, action: null },
     { name: "Block", icon: <MdOutlineBlock />, action: null },
     { name: "View Engagement", icon: <MdBarChart />, action: null },
-    { name: "Bookmark Post", icon: <GoBookmark />, action: null },
+    {
+      name: "Bookmark Post",
+      icon: <GoBookmark />,
+      action: null,
+    },
     { name: "Report", icon: <MdOutlineReport />, action: null },
   ];
 
@@ -97,6 +102,8 @@ function Post({
       action: null,
     },
   ];
+
+  const bookmarkIcon = isBookmarked ? FilledBookmark : Bookmark;
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -117,12 +124,12 @@ function Post({
   return (
     <>
       <div className="flex items-start px-2 py-1 gap-2 w-full ">
-        <Avatar profilePhoto={profilePicturePath} userId={userId} />
+        <Avatar profilePhoto={user?.profilePicturePath} userId={user?._id} />
 
         <div className="flex flex-col gap-1 w-full justify-start">
           <div className="relative mt-1 flex gap-2 text-sm place-item-center ">
-            <p className=" font-semibold text-white">{name}</p>
-            <p className=" text-gray-400  ">@{username}</p>
+            <p className=" font-semibold text-white">{user?.name}</p>
+            <p className=" text-gray-400  ">@{user?.username}</p>
             <span className=" text-gray-400  ">20h</span>
             <SlOptions
               onClick={() => setMenu(!menu)}
@@ -149,7 +156,7 @@ function Post({
           {picturePath && (
             <img
               onClick={() => navigate(`/${_id}/photo/${picturePath}`)}
-              src={`http://localhost:1414/assets/${picturePath}`}
+              src={picturePath}
               className="self-start rounded-2xl object-cover max-h-[520px] w-auto cursor-pointer"
               alt="post"
             />
@@ -168,8 +175,12 @@ function Post({
               </span>
             ))}
 
-            <div className="flex gap-2 text-xl cursor-pointer ">
-              <GoBookmark onClick={handleBookmark} />
+            <div className="flex items-center gap-2 text-xl cursor-pointer ">
+              <img
+                onClick={handleBookmark}
+                src={bookmarkIcon}
+                className="h-[17px] w-auto invert"
+              />
               <RiShare2Line />
             </div>
           </div>

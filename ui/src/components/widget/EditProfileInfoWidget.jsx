@@ -4,14 +4,15 @@ import { useNavigate } from "react-router-dom";
 import { updateUser } from "../../fetch/helper";
 import { toast } from "react-hot-toast";
 import { MdOutlineAddAPhoto } from "react-icons/md";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import defaultPhoto from "../../assets/profile.png";
 import { Box, TextField } from "@mui/material";
-import { selectUser } from "../../store/authSlice";
+import { selectUser, setFriendProfile, setUser } from "../../store/authSlice";
 import { axiosInstance } from "../../fetch/axios";
 
 function EditProfileInfoWidget() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const user = useSelector(selectUser);
 
   const [profilePicturePath, setProfilePicturePath] = useState(null);
@@ -49,55 +50,27 @@ function EditProfileInfoWidget() {
     e.preventDefault();
     try {
       // Prepare data object
-      const data = {
-        userId: user._id,
-        name: name || user.name,
-        bio: bio || user.bio,
-        from: location || user.from,
-        coverPicture: null,
-        profilePicturePath: null,
-      };
+      const formData = new FormData();
+      formData.append("userId", user._id);
+      if (name) formData.append("name", name);
+      if (bio) formData.append("bio", bio);
+      if (location) formData.append("from", location);
+      if (profilePicturePath)
+        formData.append("profilePicturePath", profilePicturePath);
+      if (coverPicture) formData.append("coverPicture", coverPicture);
 
-      // Convert images to Base64 if they exist
-      if (coverPicture) {
-        const reader = new FileReader();
-        await new Promise((resolve, reject) => {
-          reader.onload = () => {
-            data.coverPicture = reader.result; // Base64 encoded string
-            resolve();
-          };
-          reader.onerror = (error) => reject(error);
-          reader.readAsDataURL(coverPicture);
-        });
-      }
-
-      if (profilePicturePath) {
-        const reader = new FileReader();
-        await new Promise((resolve, reject) => {
-          reader.onload = () => {
-            data.profilePicturePath = reader.result; // Base64 encoded string
-            resolve();
-          };
-          reader.onerror = (error) => reject(error);
-          reader.readAsDataURL(profilePicturePath);
-        });
-      }
-
-      // Debugging: Log the data object
-      console.log("Data being sent:", JSON.stringify(data, null, 2));
-
-      // Send the data
-      const response = await axiosInstance.patch("/user/update", data);
-
-      // Handle the response
-      if (response.ok) {
-        console.log("Update successful:", response.data);
-        toast.success("Update successful!");
-        navigate(-1); // Navigate back
-      } else {
-        console.error("Update failed:");
-        toast.error("Update failed, please try again.");
-      }
+      // const response = axiosInstance.patch("/user/update", formData);
+      const response = updateUser(formData);
+      await toast.promise(response, {
+        loading: "Updating...",
+        success: "Update Successful",
+        error: (error) => error.response.data.message || "Error!",
+      });
+      response.then((data) => {
+        dispatch(setUser(data));
+        dispatch(setFriendProfile(data));
+      });
+      navigate(-1);
     } catch (error) {
       console.error("Error During Update:", error);
       toast.error("Update failed, please try again.");
@@ -158,7 +131,7 @@ function EditProfileInfoWidget() {
               <>
                 <div className="absolute flex gap-1 left-[45%] top-[42%] text-3xl justify-center items-center ">
                   <label
-                    htmlFor="backgroundImage"
+                    htmlFor="coverPicture"
                     className="p-2 rounded-full bg-gray-700 bg-opacity-45 hover:bg-opacity-75 "
                   >
                     <MdOutlineAddAPhoto />
@@ -172,10 +145,11 @@ function EditProfileInfoWidget() {
                     ))}
                 </div>
                 <input
+                  accept="image/*"
                   onChange={backgroundPhotoHandleChange}
                   type="file"
                   name="coverPicture"
-                  id="backgroundImage"
+                  id="coverPicture"
                   style={{ display: "none" }}
                 />
               </>
@@ -206,6 +180,7 @@ function EditProfileInfoWidget() {
                 />
               </label>
               <input
+                accept="image/*"
                 onChange={handleChangeProfilePicture}
                 type="file"
                 name="profilePicture"

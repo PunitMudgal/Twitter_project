@@ -1,9 +1,11 @@
 import Avatar from "../Avatar";
 import tick from "../../assets/tick.png";
 import logo from "../../assets/white.png";
+import { GoBookmark } from "react-icons/go";
 import moreIcon from "../../assets/more.svg";
 import menuIcon from "../../assets/menu.svg";
 import homeIcon from "../../assets/home.svg";
+import bookmarkIcon from "../../assets/bookmark.png";
 import profileIcon from "../../assets/user.svg";
 import searchIcon from "../../assets/search.svg";
 import premiumIcon from "../../assets/premium.svg";
@@ -33,6 +35,7 @@ function LeftComp() {
     { name: "search", icon: searchIcon, route: "/search" },
     { name: "notifications", icon: notificationIcon, route: "/notifications" },
     { name: "messages", icon: messageIcon, route: "/messenger" },
+    { name: "bookmark", icon: bookmarkIcon, route: "/home/bookmark" },
     { name: "commuinities", icon: communitiesIcon, route: "/communities" },
     { name: "business", icon: businessIcon, route: "/business" },
     { name: "profile", icon: profileIcon, route: `/home/${_id}` },
@@ -73,7 +76,7 @@ function LeftComp() {
       </Link>
 
       {/* icons */}
-      <div className="flex flex-col place-items-start gap-3 ml-[37%] p-3 font-style2 lg:mx-auto lg:gap-1 ">
+      <div className="flex flex-col place-items-start gap-2 ml-[37%] p-3 font-style2 lg:mx-auto lg:gap-1 ">
         {Icons.map((icon) => (
           <NavLink
             end

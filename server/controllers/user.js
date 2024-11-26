@@ -83,62 +83,36 @@ export const unfollowUser = async (req, res) => {
 
 /** UPDATE USER /updateUser */
 export const updateUser = async (req, res) => {
+  const { userId, name, bio, from } = req.body;
+  const { userId: loggedInUserId, isAdmin } = req.user;
   try {
-    const { userId, name, bio, from, coverPicture, profilePicturePath } =
-      req.body;
-    const { userId: requesterId, isAdmin, _id } = req.user; // Assume user info from middleware
-    console.log("is authorized- -", requesterId === userId);
-    console.log("req.body id - -", req.body.name);
-
-    // Authorization check
-    if (userId !== requesterId && !isAdmin) {
-      return res.status(403).json({ error: "User not authorized!" });
+    if (loggedInUserId !== userId && !isAdmin) {
+      return res.status(403).json({ message: "You can update your own data" });
     }
 
-    let coverPictureUrl = null;
-    let profilePictureUrl = null;
-
-    // Upload profile picture if provided
-    if (profilePicturePath) {
-      const uploadProfile = await cloudinary.uploader.upload(
-        profilePicturePath,
-        {
-          folder: "users/profile_pictures",
-        }
-      );
-      profilePictureUrl = uploadProfile.secure_url;
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).send({ message: "User not found!" });
     }
 
-    // Upload cover picture if provided
-    if (coverPicture) {
-      const uploadCover = await cloudinary.uploader.upload(coverPicture, {
-        folder: "users/cover_pictures",
-      });
-      coverPictureUrl = uploadCover.secure_url;
+    // Update user details
+    if (name) user.name = name;
+    if (bio) user.bio = bio;
+    if (from) user.from = from;
+
+    if (req.files["profilePicturePath"]) {
+      user.profilePicturePath = req.files["profilePicturePath"][0].path;
     }
 
-    // Prepare update data
-    const updateData = {
-      ...(name && { name }),
-      ...(bio && { bio }),
-      ...(from && { from }),
-      ...(profilePictureUrl && { profilePicturePath: profilePictureUrl }),
-      ...(coverPictureUrl && { coverPicture: coverPictureUrl }),
-    };
-
-    // Update the user in the database
-    const updatedUser = await User.findByIdAndUpdate(_id, updateData, {
-      new: true, // Return the updated document
-    });
-
-    if (updatedUser) {
-      return res.status(200).json(updatedUser);
-    } else {
-      return res.status(404).json({ error: "User not found!" });
+    if (req.files["coverPicture"]) {
+      user.coverPicture = req.files["coverPicture"][0].path;
     }
+
+    const updatedUser = await user.save();
+    res.status(200).send(updatedUser);
   } catch (error) {
     console.error("Error updating user:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).send({ message: "Internal server error" });
   }
 };
 
@@ -241,7 +215,7 @@ export const deleteUser = async (req, res) => {
 export const getAllUsers = async (req, res) => {
   const { _id } = req.user;
   try {
-    const users = await User.find({ _id: { $ne: userId } })
+    const users = await User.find({ _id: { $ne: _id } })
       .select("name username profilePicturePath isAdmin _id")
       .lean();
     res.status(200).json(users);
@@ -249,29 +223,3 @@ export const getAllUsers = async (req, res) => {
     res.status(500).json({ message: "Failed to fetch users data", error });
   }
 };
-
-// export const updateUser = async (req, res) => {
-//   try {
-//     if (req.body.userId === req.user.userId || req.user.isAdmin) {
-//       const body = req.body;
-//       // handling file uploads
-//       const picture = req.files["picture"] ? req.files["picture"][0] : null;
-//       const backgroundPhoto = req.files["backgroundPhoto"]
-//         ? req.files["backgroundPhoto"][0]
-//         : null;
-
-//       // if files are uploaded, include them in the update body
-//       if (picture) body.picture = `/assets/${picture.filename}`;
-//       if (backgroundPhoto)
-//         body.backgroundPhoto = `/assets/${backgroundPhoto.filename}`;
-
-//       //update user
-//       const updateInfo = await User.updateOne({ _id: req.body.userId }, body);
-//       if (updateInfo.modifiedCount > 0)
-//         return res.status(201).send({ msg: "record updated!", updateInfo });
-//       else return res.status(401).send({ error: "couldn't update user info" });
-//     } else return res.status(401).send({ error: "user not authorized!" });
-//   } catch (error) {
-//     return res.status(501).send({ error });
-//   }
-// };
