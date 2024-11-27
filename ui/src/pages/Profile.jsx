@@ -26,7 +26,7 @@ function Profile() {
     createdAt,
     bio,
     from,
-  } = useSelector((state) => state.auth.friendProfile) || {};
+  } = useSelector((state) => state.user?.friendProfile) || {};
 
   const LogedInUsername = useSelector((state) => state.auth?.user?._id);
 
@@ -129,7 +129,7 @@ function Profile() {
         <div className="bg-zinc-800 w-full h-[27%] ">
           {coverPicture && (
             <img
-              className="h-full w-full object-cover overflow-hidden object-top "
+              className="h-full w-full object-cover overflow-hidden object-center "
               src={coverPicture}
               alt="cover"
             />

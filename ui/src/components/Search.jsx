@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import searchIcon from "../assets/search.svg";
 import { useDispatch, useSelector } from "react-redux";
-import { setSearchResult } from "../store/authSlice";
 import { searchUser } from "../fetch/helper";
 import FriendWidget from "./widget/FriendWidget";
+import { setSearchResult } from "../store/userSlice";
 
 function Search() {
   const dispatch = useDispatch();
@@ -11,11 +11,11 @@ function Search() {
   const [searchText, setSearchText] = useState("");
   const [searchMenu, setSearchMenu] = useState(false);
 
-  const searchResult = useSelector((state) => state.auth?.searchResult);
+  const searchResult = useSelector((state) => state.user?.searchResult);
 
   const submitSearch = async () => {
     if (searchText) {
-      const data = await searchUser(searchText.toLocaleLowerCase());
+      const data = await searchUser(searchText.toLowerCase());
       dispatch(setSearchResult(data));
     }
   };

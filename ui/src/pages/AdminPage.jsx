@@ -42,7 +42,7 @@ function AdminPage() {
 
   return (
     <div className="h-full w-full bg-opacity-60 bg-gray-800 absolute top-0 left-0 z-20 flex justify-center items-center">
-      <div className="h-[85%] w-[75%] p-2 bg-opacity-40 bg-black border-2 border-gray-700 rounded-2xl backdrop-blur-sm m-auto shadow-md z-30">
+      <div className="h-[85%] w-[75%] p-2 bg-opacity-40 bg-black border-2 border-gray-700 rounded-2xl backdrop-blur-sm m-auto shadow-md overflow-auto z-30">
         <p
           onClick={() => navigate(-1)}
           className="hover:underline cursor-pointer float-right font-extralight"

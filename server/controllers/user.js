@@ -7,7 +7,9 @@ import cloudinary from "../lib/cloudinary.js";
 export const getUser = async (req, res) => {
   try {
     const { id } = req.params;
-    const user = await User.findById(id).lean();
+    const user = await User.findById(id)
+      .select("-password -bookmark -email")
+      .lean();
     res.status(200).json(user);
   } catch (error) {
     res.status(404).json({ message: error.message });
@@ -24,26 +26,32 @@ export const searchUser = async (req, res) => {
         { name: { $regex: `^${name}`, $options: "i" } },
       ],
       // $options: 'i' makes it case-insensitive
-    }).lean(); // lean() to return plain JavaScript objects instead of Mongoose documents
+    })
+      .select("-password -bookmark -email")
+      .lean();
     if (!users || users.length === 0)
-      return res.status(404).send({ err: "user not found!" });
-    return res.status(201).send(users);
+      return res.status(404).json({ err: "user not found!" });
+    return res.status(201).json(users);
   } catch (error) {
-    return res.status(500).send({ msg: error.message });
+    return res.status(500).json({ msg: error.message });
   }
 };
 
 // follow
 /** put -> user/:id/follow */
 export const followUser = async (req, res) => {
-  if (req.body.userId !== req.params.id) {
+  const { userId } = req.user;
+  const { id } = req.params;
+  if (userId !== id) {
     try {
-      const user = await User.findById(req.params.id);
-      const currentUser = await User.findById(req.body.userId);
+      const user = await User.findById(id).select("-password -bookmark -email");
 
-      if (!user.follower.includes(req.body.userId)) {
-        await user.updateOne({ $push: { follower: req.body.userId } });
-        await currentUser.updateOne({ $push: { following: req.params.id } });
+      const currentUser = await User.findById(userId);
+
+      if (!user.follower.includes(userId)) {
+        await user.updateOne({ $push: { follower: userId } });
+        await currentUser.updateOne({ $push: { following: id } });
+        console.log("user == = ", user);
         return res.status(200).json(user);
       } else {
         return res
@@ -61,14 +69,17 @@ export const followUser = async (req, res) => {
 // unfollow
 /** put -> user/:id/unfollow */
 export const unfollowUser = async (req, res) => {
-  if (req.body.userId !== req.params.id) {
+  const { userId } = req.user;
+  const { id } = req.params;
+  if (userId !== id) {
     try {
-      const user = await User.findById(req.params.id);
-      const currentUser = await User.findById(req.body.userId);
+      const user = await User.findById(id).select("-password -bookmark -email");
 
-      if (user.follower.includes(req.body.userId)) {
-        await user.updateOne({ $pull: { follower: req.body.userId } });
-        await currentUser.updateOne({ $pull: { following: req.params.id } });
+      const currentUser = await User.findById(userId);
+
+      if (user.follower.includes(userId)) {
+        await user.updateOne({ $pull: { follower: userId } });
+        await currentUser.updateOne({ $pull: { following: id } });
         return res.status(200).json(user);
       } else {
         return res.status(403).json({ message: "you don't follow this user" });
@@ -92,7 +103,7 @@ export const updateUser = async (req, res) => {
 
     const user = await User.findById(userId);
     if (!user) {
-      return res.status(404).send({ message: "User not found!" });
+      return res.status(404).json({ message: "User not found!" });
     }
 
     // Update user details
@@ -109,10 +120,10 @@ export const updateUser = async (req, res) => {
     }
 
     const updatedUser = await user.save();
-    res.status(200).send(updatedUser);
+    res.status(200).json(updatedUser);
   } catch (error) {
     console.error("Error updating user:", error);
-    res.status(500).send({ message: "Internal server error" });
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -138,6 +149,7 @@ export const getFriendSuggestions = async (req, res) => {
         },
       },
     ]);
+    // .lean();
     return res.status(200).json(suggestions);
   } catch (error) {
     console.error("Error fetching friend suggestions:", error);

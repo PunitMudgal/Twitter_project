@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { RiRefreshLine } from "react-icons/ri";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import tick from "../../assets/tick.png";
 import chatIcon from "../../assets/chat.svg";
@@ -10,15 +10,19 @@ import { getAllFollowing, getFriendSuggestion } from "../../fetch/helper";
 import Loading from "../Loading";
 import "../../style/profile.css";
 import FriendWidget from "../widget/FriendWidget";
+import { setCurrentFollowing } from "../../store/authSlice";
 import { truncateUsername } from "../../store/authSlice";
 import Search from "../Search";
+import useFollowUnfollow from "../../store/useFollowUnfollow";
 
 function RightComp() {
+  const { handleUnfollowUser } = useFollowUnfollow();
+  const dispatch = useDispatch();
   const currentUser = useSelector((state) => state.auth?.user);
+  const currentFollowing = useSelector((state) => state.auth?.currentFollowing);
 
   const [isRotating, setIsRotating] = useState(false);
   const [suggestedFriends, setSuggestedFriends] = useState([]);
-  const [followings, setFollowings] = useState([]);
   const [suggestionLoading, setSuggestionLoading] = useState(true);
 
   const handleRefreshClick = () => {
@@ -51,7 +55,7 @@ function RightComp() {
   const fetchFollowing = async () => {
     try {
       const data = await getAllFollowing(currentUser?.following);
-      setFollowings(data);
+      dispatch(setCurrentFollowing(data));
     } catch (error) {
       console.error("Error fetching friends:", error);
     }
@@ -116,7 +120,7 @@ function RightComp() {
                   whileHover={{ scale: 1.05 }} // Optional: scale up on hover
                   transition={{ type: "spring", stiffness: 120 }}
                 >
-                  <FriendWidget {...friend} setFollowings={setFollowings} />
+                  <FriendWidget {...friend} />
                 </motion.div>
               ))}
             </motion.div>
@@ -131,11 +135,11 @@ function RightComp() {
           animate="visible"
         >
           <p className="font-semibold mb-2 text-lg">
-            Your Friends{" "}
-            <span className="text-sm ">({followings?.length})</span>{" "}
+            Your Followings{" "}
+            <span className="text-sm ">({currentFollowing?.length})</span>{" "}
           </p>
 
-          {followings?.slice(0, 4).map((friend) => (
+          {currentFollowing?.slice(0, 4).map((friend) => (
             <motion.div
               key={friend?._id}
               className="flex gap-2 items-center p-2 text-sm font-semibold rounded-3xl hover:bg-purple-500 hover:bg-opacity-20 "
@@ -158,6 +162,12 @@ function RightComp() {
                   @{truncateUsername(friend?.username)}
                 </p>
               </div>
+              <button
+                onClick={() => handleUnfollowUser(friend._id)}
+                className="p-2 px-3 rounded-3xl ml-auto border bg-transparent text-white hover:text-red-600 hover:border-red-600"
+              >
+                Unfollow
+              </button>
               <img
                 className="h-6 w-auto invert ml-auto"
                 src={chatIcon}

@@ -3,7 +3,7 @@ import Avatar from "./Avatar";
 import { FcLike } from "react-icons/fc";
 import { BiRepost, BiComment } from "react-icons/bi";
 import { MdBarChart, MdOutlineReport, MdOutlineBlock } from "react-icons/md";
-import { GoBookmark, GoBookmarkFill, GoHeart } from "react-icons/go";
+import { GoBookmark, GoHeart } from "react-icons/go";
 import { RiShare2Line, RiDeleteBin6Line } from "react-icons/ri";
 import FilledBookmark from "../assets/bookmarkYellow.png";
 import Bookmark from "../assets/bookmark.png";
@@ -179,7 +179,7 @@ function Post({
               <img
                 onClick={handleBookmark}
                 src={bookmarkIcon}
-                className="h-[17px] w-auto invert"
+                className="h-[17px] w-auto"
               />
               <RiShare2Line />
             </div>

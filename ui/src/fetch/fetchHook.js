@@ -1,9 +1,9 @@
 import { useDispatch } from "react-redux";
 import { getUserFromToken } from "./helper.js";
 import { useEffect, useMemo, useState } from "react";
-import { setFriendProfile, setUser } from "../store/authSlice.js";
 import axios from "axios";
 import { axiosInstance } from "./axios.js";
+import { setFriendProfile } from "../store/userSlice.js";
 
 export default function useFetchHook(query) {
   const dispatch = useDispatch();

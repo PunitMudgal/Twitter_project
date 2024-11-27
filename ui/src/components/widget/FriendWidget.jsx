@@ -4,64 +4,17 @@ import tick from "../../assets/tick.png";
 import Avatar from "../Avatar";
 import toast from "react-hot-toast";
 import { follow, unfollow } from "../../fetch/helper";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import useFollowUnfollow from "../../store/useFollowUnfollow";
 
-function FriendWidget({
-  _id,
-  profilePicturePath,
-  name,
-  username,
-  isAdmin,
-  setFollowings,
-}) {
+function FriendWidget({ _id, profilePicturePath, name, username, isAdmin }) {
   const currentUser = useSelector((state) => state.auth?.user);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const doesContain = useMemo(
-    () => currentUser.following.includes(_id),
-    [currentUser.following, _id]
-  );
-
-  // Follow
-  const handleFollowUser = async (friendId) => {
-    if (!currentUser?._id) {
-      return toast.error("User information is missing!");
-    }
-    try {
-      const followPromise = follow(currentUser._id, friendId);
-      toast.promise(followPromise, {
-        loading: "Loading...",
-        success: "Followed successfully",
-        error: (error) => error.response?.data?.message || "An error occurred",
-      });
-      followPromise.then((data) => {
-        setFollowings((prev) => [...prev, data]);
-      });
-    } catch (error) {
-      toast.error(error.response?.data?.message);
-    }
-  };
-
-  // unfollow
-  const handleUnfollowUser = async (friendId) => {
-    if (!currentUser?._id) {
-      return toast.error("User or token information is missing!");
-    }
-    try {
-      const unfollowPromise = unfollow(currentUser._id, friendId);
-      await toast.promise(unfollowPromise, {
-        loading: "Loading...",
-        success: "Unfollowed successfully",
-        error: (err) => err.response?.data?.message,
-      });
-      unfollowPromise.then((data) => {
-        setFollowings((prev) => prev.filter((usr) => usr._id !== data._id));
-      });
-    } catch (error) {
-      toast.error(error.response?.data?.message);
-    }
-  };
+  const doesContain = currentUser.following.includes(_id);
+  const { handleFollowUser, handleUnfollowUser } = useFollowUnfollow();
 
   return (
     <div className="flex gap-2 items-center p-2 text-sm font-semibold rounded-3xl hover:bg-purple-500 hover:bg-opacity-20 ">

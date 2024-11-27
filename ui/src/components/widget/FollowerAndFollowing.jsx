@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import backIcon from "../../assets/next.svg";
 import { useNavigate, useParams } from "react-router-dom";
 import { getAllFollower, getAllFollowing } from "../../fetch/helper";
-import { setFollower, setFollowing } from "../../store/authSlice";
+import { setFollower, setFollowing } from "../../store/userSlice";
 import toast from "react-hot-toast";
 import FriendWidget from "./FriendWidget";
 
@@ -16,9 +16,9 @@ function FollowerAndFollowing() {
 
   const currentUser = useSelector((state) => state.auth?.user);
   const { name, username, isAdmin, following, follower } =
-    useSelector((state) => state.auth.friendProfile) || {};
-  const followings = useSelector((state) => state.auth.following) || {};
-  const followers = useSelector((state) => state.auth.follower) || {};
+    useSelector((state) => state.user.friendProfile) || {};
+  const followings = useSelector((state) => state.user.following) || {};
+  const followers = useSelector((state) => state.user.follower) || {};
 
   const [activeTab, setActiveTab] = useState("following");
 
@@ -34,7 +34,7 @@ function FollowerAndFollowing() {
 
   useEffect(() => {
     if (following?.length) {
-      fetchFollowing(); // Call the async function
+      fetchFollowing();
     }
   }, [following]);
 
@@ -50,7 +50,7 @@ function FollowerAndFollowing() {
 
   useEffect(() => {
     if (follower?.length) {
-      fetchFollowers(); // Call the async function
+      fetchFollowers();
     }
   }, [follower]);
 
@@ -90,7 +90,7 @@ function FollowerAndFollowing() {
               You are not following anyone
             </p>
           ) : (
-            followings.map((user) => (
+            followings?.map((user) => (
               <FriendWidget
                 key={user._id}
                 {...user}

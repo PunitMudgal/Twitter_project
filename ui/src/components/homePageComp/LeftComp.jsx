@@ -5,7 +5,7 @@ import { GoBookmark } from "react-icons/go";
 import moreIcon from "../../assets/more.svg";
 import menuIcon from "../../assets/menu.svg";
 import homeIcon from "../../assets/home.svg";
-import bookmarkIcon from "../../assets/bookmark.png";
+import bookmarkIcon from "../../assets/bookmark2.png";
 import profileIcon from "../../assets/user.svg";
 import searchIcon from "../../assets/search.svg";
 import premiumIcon from "../../assets/premium.svg";

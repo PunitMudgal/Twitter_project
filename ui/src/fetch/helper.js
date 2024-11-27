@@ -57,23 +57,25 @@ export async function updateUser(values) {
 }
 
 // follow user
-export async function follow(userId, friendId) {
+export async function follow(friendId) {
   try {
-    const { data } = await axiosInstance.put(`/user/${friendId}/follow`, {
-      userId,
-    });
+    const { data } = await axiosInstance.put(`/user/${friendId}/follow`);
     return data;
   } catch (error) {
-    toast.error(error.response.data.message);
+    if (error.response) {
+      const errorMessage =
+        error.response.data.message || "Something went wrong!";
+      toast.error(errorMessage);
+    } else {
+      toast.error("Network error, please try again!");
+    }
   }
 }
 
 // unfollow user
-export async function unfollow(userId, friendId) {
+export async function unfollow(friendId) {
   try {
-    const { data } = await axiosInstance.put(`/user/${friendId}/unfollow`, {
-      userId,
-    });
+    const { data } = await axiosInstance.put(`/user/${friendId}/unfollow`);
     return data;
   } catch (error) {
     toast.error(error.response.data.message);

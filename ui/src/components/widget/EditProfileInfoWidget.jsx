@@ -7,8 +7,8 @@ import { MdOutlineAddAPhoto } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import defaultPhoto from "../../assets/profile.png";
 import { Box, TextField } from "@mui/material";
-import { selectUser, setFriendProfile, setUser } from "../../store/authSlice";
-import { axiosInstance } from "../../fetch/axios";
+import { selectUser, setUser } from "../../store/authSlice";
+import { setFriendProfile } from "../../store/userSlice";
 
 function EditProfileInfoWidget() {
   const navigate = useNavigate();

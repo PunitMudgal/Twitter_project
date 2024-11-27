@@ -1,13 +1,14 @@
-import { createSelector, createSlice } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 import { axiosInstance } from "../fetch/axios";
 
 const initialState = {
   user: null,
   isCheckingAuth: true,
-  friendProfile: null,
-  following: [],
-  follower: [],
-  searchResult: [],
+  currentFollowing: [],
+  // friendProfile: null,
+  // following: [],
+  // follower: [],
+  // searchResult: [],
 };
 
 export const authSlice = createSlice({
@@ -20,18 +21,38 @@ export const authSlice = createSlice({
     setCheckingAuth: (state, action) => {
       state.isCheckingAuth = action.payload;
     },
-    setFriendProfile: (state, action) => {
-      state.friendProfile = action.payload;
+    setCurrentFollowing: (state, action) => {
+      state.currentFollowing = action.payload;
     },
-    setFollowing: (state, action) => {
-      state.following = action.payload;
+    setAddCurrentFollowing: (state, action) => {
+      state.currentFollowing = [...state.currentFollowing, action.payload];
     },
-    setFollower: (state, action) => {
-      state.follower = action.payload;
+    removeCurrentFollowing: (state, action) => {
+      state.currentFollowing = state.currentFollowing.filter(
+        (usr) => usr._id !== action.payload
+      );
     },
-    setSearchResult: (state, action) => {
-      state.searchResult = action.payload;
-    },
+    // setFriendProfile: (state, action) => {
+    //   state.friendProfile = action.payload;
+    // },
+    // setFollowing: (state, action) => {
+    //   state.following = action.payload;
+    // },
+    // removeFollowing: (state, action) => {
+    //   // Filter out the unfollowed user by ID
+    //   state.following = state.following.filter(
+    //     (usr) => usr._id !== action.payload
+    //   );
+    //   state.currentFollowing = state.currentFollowing.filter(
+    //     (usr) => usr._id !== action.payload
+    //   );
+    // },
+    // setFollower: (state, action) => {
+    //   state.follower = action.payload;
+    // },
+    // setSearchResult: (state, action) => {
+    //   state.searchResult = action.payload;
+    // },
   },
 });
 
@@ -64,10 +85,9 @@ export const selectUser = (state) => state.auth.user || {};
 
 export const {
   setUser,
-  setFriendProfile,
-  setFollowing,
-  setFollower,
-  setSearchResult,
   setCheckingAuth,
+  setCurrentFollowing,
+  setAddCurrentFollowing,
+  removeCurrentFollowing,
 } = authSlice.actions;
 export default authSlice.reducer;
