@@ -4,8 +4,9 @@ import { RxCross1 } from "react-icons/rx";
 
 function ViewPhoto() {
   const { picturePath } = useParams();
-  const navigate = useNavigate();
+  const decodedPath = decodeURIComponent(picturePath);
 
+  const navigate = useNavigate();
   return (
     <div className="flex justify-center items-center h-screen w-full overflow-hidden text-white">
       <RxCross1
@@ -14,7 +15,7 @@ function ViewPhoto() {
       />
       <img
         className="object-cover m-4 h-[85%] md:h-auto md:w-[90%] rounded-md  "
-        src={picturePath}
+        src={decodedPath}
         alt="profile photo"
       />
     </div>

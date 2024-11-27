@@ -129,6 +129,12 @@ function Profile() {
         <div className="bg-zinc-800 w-full h-[27%] ">
           {coverPicture && (
             <img
+              onClick={() =>
+                navigate(
+                  coverPicture &&
+                    `/${id}/photo/${encodeURIComponent(coverPicture)}`
+                )
+              }
               className="h-full w-full object-cover overflow-hidden object-center "
               src={coverPicture}
               alt="cover"
@@ -139,7 +145,10 @@ function Profile() {
         {/* Profile Photo */}
         <img
           onClick={() =>
-            navigate(profilePicturePath && `/${id}/photo/${profilePicturePath}`)
+            navigate(
+              profilePicturePath &&
+                `/${id}/photo/${encodeURIComponent(profilePicturePath)}`
+            )
           }
           className="absolute top-[16%] left-4 h-36 w-36  object-cover border-4 border-gray-900 rounded-full transition-transform duration-300 ease-in-out transform hover:scale-105 hover:border-2 cursor-pointer"
           src={profilePicturePath || defaultPhoto}

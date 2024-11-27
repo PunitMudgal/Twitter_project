@@ -155,7 +155,9 @@ function Post({
           <p className="mb-1">{text}</p>
           {picturePath && (
             <img
-              onClick={() => navigate(`/${_id}/photo/${picturePath}`)}
+              onClick={() =>
+                navigate(`/${_id}/photo/${encodeURIComponent(picturePath)}`)
+              }
               src={picturePath}
               className="self-start rounded-2xl object-cover max-h-[520px] w-auto cursor-pointer"
               alt="post"

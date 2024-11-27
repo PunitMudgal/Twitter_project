@@ -8,7 +8,9 @@ import Logo from "./assets/blue.png";
 import Messenger from "./pages/Messenger";
 import { checkAuth } from "./store/authSlice";
 import { useDispatch } from "react-redux";
+import ViewPhoto from "./components/ViewPhoto";
 
+// const ViewPhoto = lazy(() => import("./components/ViewPhoto"));
 const Home = lazy(() => import("./pages/Home"));
 const SignIn = lazy(() => import("./authentication/SignIn"));
 const RegisterProfileCard = lazy(() =>
@@ -16,7 +18,6 @@ const RegisterProfileCard = lazy(() =>
 );
 const Profile = lazy(() => import("./pages/Profile"));
 const AdminPage = lazy(() => import("./pages/AdminPage"));
-const ViewPhoto = lazy(() => import("./components/ViewPhoto"));
 const EditProfileInfoWidget = lazy(() =>
   import("./components/widget/EditProfileInfoWidget")
 );
