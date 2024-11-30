@@ -5,10 +5,6 @@ const initialState = {
   user: null,
   isCheckingAuth: true,
   currentFollowing: [],
-  // friendProfile: null,
-  // following: [],
-  // follower: [],
-  // searchResult: [],
 };
 
 export const authSlice = createSlice({
@@ -32,27 +28,6 @@ export const authSlice = createSlice({
         (usr) => usr._id !== action.payload
       );
     },
-    // setFriendProfile: (state, action) => {
-    //   state.friendProfile = action.payload;
-    // },
-    // setFollowing: (state, action) => {
-    //   state.following = action.payload;
-    // },
-    // removeFollowing: (state, action) => {
-    //   // Filter out the unfollowed user by ID
-    //   state.following = state.following.filter(
-    //     (usr) => usr._id !== action.payload
-    //   );
-    //   state.currentFollowing = state.currentFollowing.filter(
-    //     (usr) => usr._id !== action.payload
-    //   );
-    // },
-    // setFollower: (state, action) => {
-    //   state.follower = action.payload;
-    // },
-    // setSearchResult: (state, action) => {
-    //   state.searchResult = action.payload;
-    // },
   },
 });
 

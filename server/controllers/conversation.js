@@ -5,13 +5,18 @@ export const createConversation = async (req, res) => {
   try {
     const { participants } = req.body;
 
+    if (!Array.isArray(participants) || participants.length < 2) {
+      return res.status(400).json({ message: "Invalid participants list." });
+    }
+
     let conversation = await Conversation.findOne({
       participants: { $all: participants },
+      $expr: { $eq: [{ $size: "$participants" }, participants.length] },
     });
 
     if (conversation) return res.status(200).json(conversation);
 
-    conversation = new Conversation({ participants, lastMessage: "" });
+    conversation = new Conversation({ participants, lastMessage: null });
     await conversation.save();
 
     res.status(201).json(conversation);
@@ -22,12 +27,12 @@ export const createConversation = async (req, res) => {
 
 export const getConversations = async (req, res) => {
   try {
-    const { userId } = req.params;
+    const { _id } = req.user;
 
-    const conversations = await Conversation.find({ participants: userId })
+    const conversations = await Conversation.find({ participants: _id })
       .populate({
         path: "participants",
-        match: { _id: { $ne: userId } }, // exluding logedin user details
+        match: { _id: { $ne: _id } }, // exluding logedin user details
         select: "name username profilePicturePath isAdmin",
       })
       .populate({

@@ -224,6 +224,11 @@ export async function deletePost(req, res) {
     }
 
     await Post.findByIdAndDelete(postId);
+    await User.updateMany(
+      { bookmark: postId },
+      { $pull: { bookmark: postId } },
+      { multi: true }
+    );
     return res.status(200).json({ message: "Post deleted", post });
   } catch (error) {
     res.status(500).json({ message: "Server error" });

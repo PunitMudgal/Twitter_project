@@ -14,10 +14,14 @@ import { setCurrentFollowing } from "../../store/authSlice";
 import { truncateUsername } from "../../store/authSlice";
 import Search from "../Search";
 import useFollowUnfollow from "../../store/useFollowUnfollow";
+import { CreateConversations } from "../../store/chatSlice";
+import { useNavigate } from "react-router-dom";
 
 function RightComp() {
   const { handleUnfollowUser } = useFollowUnfollow();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const currentUser = useSelector((state) => state.auth?.user);
   const currentFollowing = useSelector((state) => state.auth?.currentFollowing);
 
@@ -81,6 +85,11 @@ function RightComp() {
     visible: { opacity: 1, y: 0 },
   };
 
+  const handleCreateChat = (friendId) => {
+    dispatch(CreateConversations({ currentUserId: currentUser._id, friendId }));
+    navigate("/messenger");
+  };
+
   return (
     <div className="col-span-3 flex flex-col gap-4 sticky top-0 overflow-hidden lg:hidden ">
       {/* search bar (top) */}
@@ -113,7 +122,7 @@ function RightComp() {
               initial="hidden"
               animate="visible"
             >
-              {suggestedFriends.map((friend) => (
+              {suggestedFriends?.map((friend) => (
                 <motion.div
                   key={friend._id}
                   variants={itemVariants}
@@ -169,7 +178,8 @@ function RightComp() {
                 Unfollow
               </button>
               <img
-                className="h-6 w-auto invert ml-auto"
+                onClick={() => handleCreateChat(friend._id)}
+                className="h-6 w-auto invert ml-auto cursor-pointer"
                 src={chatIcon}
                 alt="icon"
               />

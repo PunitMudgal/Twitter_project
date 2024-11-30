@@ -23,7 +23,7 @@ function RegisterProfileCard() {
     try {
       const formData = new FormData();
       formData.append("userId", user._id);
-      formData.append("name", name);
+      if (name) formData.append("name", name);
       if (image) {
         formData.append("profilePicturePath", image);
       }
@@ -35,6 +35,9 @@ function RegisterProfileCard() {
         error: "Update Error",
       });
       updatePromise.then(() => {
+        setName("");
+        setImage(null);
+        setPreviewProfile(null);
         navigate("/home");
       });
     } catch (error) {

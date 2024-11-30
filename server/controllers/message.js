@@ -18,6 +18,7 @@ export const createMessage = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
 export const getUserMessages = async (req, res) => {
   try {
     const { conversationId } = req.params;
@@ -31,6 +32,7 @@ export const getUserMessages = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
 export const markMessageRead = async (req, res) => {
   try {
     const { messageId } = req.params;
@@ -48,6 +50,7 @@ export const markMessageRead = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
 export const deleteMessage = async (req, res) => {
   try {
     const { messageId } = req.params;

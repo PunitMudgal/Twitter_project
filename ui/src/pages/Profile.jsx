@@ -1,5 +1,5 @@
 import toast from "react-hot-toast";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { IoCalendarOutline, IoLocationOutline } from "react-icons/io5";
 import { Outlet, useNavigate, useParams, Link } from "react-router-dom";
@@ -13,6 +13,8 @@ import Loading from "../components/Loading";
 import Post from "../components/Post";
 import { useCenterRef } from "../components/CenterRefContext";
 import { axiosInstance } from "../fetch/axios";
+import useFollowUnfollow from "../store/useFollowUnfollow";
+import { CreateConversations } from "../store/chatSlice";
 
 function Profile() {
   const {
@@ -27,14 +29,19 @@ function Profile() {
     bio,
     from,
   } = useSelector((state) => state.user?.friendProfile) || {};
-
-  const LogedInUsername = useSelector((state) => state.auth?.user?._id);
+  // const currentUser = useSelector((state) => state.auth?.user);
+  const { _id: LogedInUserId, following: currentUserFollowing } = useSelector(
+    (state) => state.auth?.user
+  );
+  const { handleFollowUser, handleUnfollowUser } = useFollowUnfollow();
 
   const { id } = useParams();
   const { isLoading } = useFetchHook(id);
-  const isSelf = LogedInUsername === id;
+  const isSelf = LogedInUserId === id;
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const centerRef = useCenterRef();
+  const doesContain = currentUserFollowing.includes(id);
 
   const [friendPosts, setFriendPosts] = useState([]);
   const [postLoading, setPostLoading] = useState(true);
@@ -63,6 +70,12 @@ function Profile() {
     } finally {
       setPostLoading(false);
     }
+  };
+
+  /** Chat */
+  const handleCreateChat = (friendId) => {
+    dispatch(CreateConversations({ currentUserId: LogedInUserId, friendId }));
+    navigate("/messenger");
   };
 
   useEffect(() => {
@@ -167,9 +180,24 @@ function Profile() {
               </button>
             ) : (
               <>
-                <img src={message} className="h-7 w-auto invert" alt="msg" />
-                <button className="py-1 px-3 border font-semibold rounded-3xl bg-gray-300 text-black">
-                  Follow
+                <img
+                  src={message}
+                  onClick={() => handleCreateChat(id)}
+                  className="h-7 w-auto invert"
+                  alt="msg"
+                />
+
+                <button
+                  onClick={() => {
+                    if (doesContain) {
+                      handleUnfollowUser(id);
+                    } else {
+                      handleFollowUser(id);
+                    }
+                  }}
+                  className="py-1 px-3 border font-semibold rounded-3xl bg-gray-300 text-black"
+                >
+                  {doesContain ? "Unfollow" : "Follow"}
                 </button>
               </>
             )}

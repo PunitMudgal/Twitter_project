@@ -1,7 +1,6 @@
 import Avatar from "../Avatar";
 import tick from "../../assets/tick.png";
 import logo from "../../assets/white.png";
-import { GoBookmark } from "react-icons/go";
 import moreIcon from "../../assets/more.svg";
 import menuIcon from "../../assets/menu.svg";
 import homeIcon from "../../assets/home.svg";
@@ -95,7 +94,7 @@ function LeftComp() {
           </NavLink>
         ))}
 
-        <button className="rounded-3xl p-2 w-full bg-violet-70 purple-gradient">
+        <button className="rounded-3xl p-2 w-full bg-violet-70 border-2 border-gray-500 purple-gradient">
           Post
         </button>
       </div>
