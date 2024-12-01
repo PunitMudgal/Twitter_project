@@ -9,10 +9,11 @@ import { useDispatch } from "react-redux";
 import "../style/authenticationStyle.css";
 import logo from "../assets/blue.png";
 import { registerValidation } from "../helper/validation.js";
-import { registerUser } from "../fetch/helper";
+import { registerUser } from "../store/authSlice";
 
 function Register() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const [isConfPassCorrenct, setIsconfPassCorrect] = useState(false);
 
@@ -29,7 +30,7 @@ function Register() {
     onSubmit: async (values, action) => {
       values = await Object.assign(values);
       try {
-        let registerPromise = registerUser(values);
+        let registerPromise = dispatch(registerUser(values));
 
         toast.promise(registerPromise, {
           loading: "Creating...",

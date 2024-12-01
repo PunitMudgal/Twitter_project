@@ -16,8 +16,12 @@ import communitiesIcon from "../../assets/communities.svg";
 import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { selectUser, setUser, truncateUsername } from "../../store/authSlice";
-import { Logout } from "../../fetch/helper";
+import {
+  Logout,
+  selectUser,
+  setUser,
+  truncateUsername,
+} from "../../store/authSlice";
 
 function LeftComp() {
   const [menu, setMenu] = useState(false);
@@ -59,7 +63,7 @@ function LeftComp() {
   }, []);
 
   const handleLogout = () => {
-    Logout();
+    dispatch(Logout());
     dispatch(setUser(null));
     navigate("/");
   };

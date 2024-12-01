@@ -7,11 +7,13 @@ import TextField from "@mui/material/TextField";
 import "../style/authenticationStyle.css";
 import logo from "../assets/blue.png";
 import { loginVerify } from "../helper/validation.js";
-import { loginUser } from "../fetch/helper";
 import toast, { Toaster } from "react-hot-toast";
+import { loginUser } from "../store/authSlice";
+import { useDispatch } from "react-redux";
 
 function SignIn() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const { values, handleChange, handleSubmit } = useFormik({
     initialValues: {
@@ -22,7 +24,7 @@ function SignIn() {
     validateOnBlur: false,
     validateOnChange: false,
     onSubmit: async (values, action) => {
-      let loginPromise = loginUser(values);
+      let loginPromise = dispatch(loginUser(values));
       toast.promise(loginPromise, {
         loading: "Logging In...",
         success: "Login Success",

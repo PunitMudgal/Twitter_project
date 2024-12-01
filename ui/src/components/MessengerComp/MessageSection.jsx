@@ -16,7 +16,6 @@ function MessageSection() {
   const selectedContact = useSelector((state) => state.chat.selectedContact);
   const user = selectedContact?.participants[0];
   const Messages = useSelector((state) => state.chat?.chat);
-  console.log("Messages", Messages);
 
   const [text, setText] = useState("");
 

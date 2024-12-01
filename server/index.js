@@ -18,9 +18,11 @@ import messageRouter from "./router/message.js";
 import { updateUser } from "./controllers/user.js";
 import { createPost } from "./controllers/post.js";
 import conversationRouter from "./router/conversation.js";
+// import { app, server } from "../socket/index.js";
+import { app, server } from "./lib/socket.js";
 
 dotenv.config();
-const app = express();
+// const app = express();
 
 /** MIDDLEWARES */
 app.use(express.json({ extended: false, limit: "50mb" }));
@@ -38,9 +40,9 @@ app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 app.use(express.json({ limit: "10mb" })); // To handle Base64 strings
 app.use(morgan("common"));
 app.disable("x-powered-by");
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-app.use("/assets", express.static(path.join(__dirname, "public/assets")));
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(__filename);
+// app.use("/assets", express.static(path.join(__dirname, "public/assets")));
 
 /** FILE STORAGE */
 // const storage = multer.diskStorage({
@@ -82,12 +84,12 @@ const port = process.env.PORT || 8080;
 
 connectDb().then(() => {
   try {
-    app.listen(port, () => {
+    server.listen(port, () => {
       console.log(`server started at ${process.env.BACKEND_SERVER_URL + port}`);
     });
   } catch (error) {
     console.log(
-      "cannot connect to the server, Please check your Internet Server",
+      "can not connect to the server, Please check your Internet",
       error
     );
   }

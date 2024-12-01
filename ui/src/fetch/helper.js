@@ -1,39 +1,8 @@
 import toast from "react-hot-toast";
 import { axiosInstance } from "./axios";
+import { connectSocket } from "../store/authSlice";
 
 /** --------- USER --------------- */
-
-/** REGISTER USER */
-export async function registerUser(userData) {
-  try {
-    const response = await axiosInstance.post(`/auth/register`, userData);
-    return response;
-  } catch (error) {
-    toast.error(error.response.data.message);
-  }
-}
-
-/** LOGIN USER */
-export async function loginUser({ emailOrUsername, password }) {
-  try {
-    const { data } = await axiosInstance.post("/auth/login", {
-      emailOrUsername,
-      password,
-    });
-    return Promise.resolve({ data });
-  } catch (error) {
-    toast.error(error.response.data.message);
-  }
-}
-
-export async function Logout() {
-  try {
-    await axiosInstance.get("/auth/logout");
-    toast.success("Logout Successfully");
-  } catch (error) {
-    toast.error(error.response.data.message);
-  }
-}
 
 /** SEARCH USER */
 export async function searchUser(name) {

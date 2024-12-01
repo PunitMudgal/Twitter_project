@@ -21,6 +21,9 @@ export const chatSlice = createSlice({
     setChat: (state, action) => {
       state.chat = action.payload;
     },
+    setAddCurrentChatMessage: (state, action) => {
+      state.chat = [...state.chat, action.payload];
+    },
     setContacts: (state, action) => {
       state.contacts = action.payload;
     },
@@ -133,6 +136,23 @@ export const deleteMessage = (messageId) => async (dispatch) => {
     console.error("Error while deleting the message:", error);
   }
 };
+
+export const subscribeToMessages = () => async (dispatch, getState) => {
+  const { selectedContact } = getState().chat;
+  const { socket } = getState().auth;
+  if (!selectedContact) return;
+
+  socket.on("newMessage", (newMessage) => {
+    dispatch(setAddCurrentChatMessage(newMessage));
+  });
+};
+
+export const unsubscribeFromMessages = () => async (dispatch) => {
+  const { socket } = getState().auth;
+
+  socket.off("newMessage");
+};
+
 export const {
   setChat,
   setContacts,
@@ -143,5 +163,6 @@ export const {
   setContactsError,
   setAddCreatedContact,
   setRemoveDeletedContact,
+  setAddCurrentChatMessage,
 } = chatSlice.actions;
 export default chatSlice.reducer;
