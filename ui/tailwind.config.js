@@ -23,7 +23,6 @@ module.exports = {
       },
       backgroundImage: {
         // "logo-image": "url('/src/assets/dark.png')",
-        // "text-logo": "url('/src/assets/forever.png')",
       },
       screens: {
         "2xl": { max: "1535px" },

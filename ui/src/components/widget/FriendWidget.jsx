@@ -38,9 +38,7 @@ function FriendWidget({
           {lastMessage ? lastMessage : `@${truncateUsername(username)}`}
         </p>
       </div>
-      {isContact ? (
-        <CiMenuKebab className="text-xl  ml-auto sm:hidden inline " />
-      ) : (
+      {!isContact && (
         <button
           onClick={() => {
             if (doesContain) {

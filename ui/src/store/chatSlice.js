@@ -5,8 +5,8 @@ import userSlice from "./userSlice";
 import axios from "axios";
 
 const initialState = {
-  chat: [],
-  contacts: [],
+  chat: [], // messages
+  contacts: [], // conversations
   selectedContact: null,
   isContactsLoading: true,
   isChatLoading: true,
@@ -20,6 +20,9 @@ export const chatSlice = createSlice({
   reducers: {
     setChat: (state, action) => {
       state.chat = action.payload;
+    },
+    setRemoveDeletedMessage: (state, action) => {
+      state.chat = state.chat.filter((user) => user._id !== action.payload);
     },
     setAddCurrentChatMessage: (state, action) => {
       state.chat = [...state.chat, action.payload];
@@ -90,6 +93,7 @@ export const deleteConversation = (conversationId) => async (dispatch) => {
       `conversation/delete-conversation/${conversationId}`
     );
     dispatch(setRemoveDeletedContact(data._id));
+    dispatch(setSelectedContact(null));
   } catch (error) {
     toast.error(error.response.data.message || error.message);
     console.error("Error in CreateConversations:", error);
@@ -101,7 +105,6 @@ export const deleteConversation = (conversationId) => async (dispatch) => {
 export const getMessage = (conversationId) => async (dispatch) => {
   try {
     const { data } = await axiosInstance.get(`/message/${conversationId}`);
-    console.log("chat data", data);
     dispatch(setChat(data));
   } catch (error) {
     toast.error(error.response.data.message || error.message);
@@ -109,15 +112,17 @@ export const getMessage = (conversationId) => async (dispatch) => {
   }
 };
 
-export const sendMessage = (conversationId, text) => async (dispatch) => {
-  try {
-    const body = { conversationId, text };
-    const { data } = await axiosInstance.post(`/message`, body);
-  } catch (error) {
-    toast.error(error.response.data.message || error.message);
-    console.error("Error While Sending Message:", error);
-  }
-};
+export const sendMessage =
+  (conversationId, receiverId, text) => async (dispatch) => {
+    try {
+      const body = { conversationId, receiverId, text };
+      const { data } = await axiosInstance.post(`/message`, body);
+      dispatch(setAddCurrentChatMessage(data));
+    } catch (error) {
+      toast.error(error.response.data.message || error.message);
+      console.error("Error While Sending Message:", error);
+    }
+  };
 
 export const markAsRead = (messageId) => async (dispatch) => {
   try {
@@ -130,7 +135,10 @@ export const markAsRead = (messageId) => async (dispatch) => {
 
 export const deleteMessage = (messageId) => async (dispatch) => {
   try {
-    await axiosInstance.delete(`/message/delete-message/${messageId}`);
+    const { data } = await axiosInstance.delete(
+      `/message/delete-message/${messageId}`
+    );
+    dispatch(setRemoveDeletedMessage(data._id));
   } catch (error) {
     toast.error(error.response.data.message || error.message);
     console.error("Error while deleting the message:", error);
@@ -140,16 +148,24 @@ export const deleteMessage = (messageId) => async (dispatch) => {
 export const subscribeToMessages = () => async (dispatch, getState) => {
   const { selectedContact } = getState().chat;
   const { socket } = getState().auth;
-  if (!selectedContact) return;
+
+  if (!selectedContact || !socket) return;
+
+  socket.off("newMessage");
 
   socket.on("newMessage", (newMessage) => {
     dispatch(setAddCurrentChatMessage(newMessage));
   });
 };
 
-export const unsubscribeFromMessages = () => async (dispatch) => {
+export const unsubscribeFromMessages = () => async (dispatch, getState) => {
   const { socket } = getState().auth;
+  if (!socket) {
+    console.warn("Socket is undefined or null during unsubscribe.");
+    return;
+  }
 
+  console.log("Unsubscribing from newMessage event.");
   socket.off("newMessage");
 };
 
@@ -164,5 +180,6 @@ export const {
   setAddCreatedContact,
   setRemoveDeletedContact,
   setAddCurrentChatMessage,
+  setRemoveDeletedMessage,
 } = chatSlice.actions;
 export default chatSlice.reducer;

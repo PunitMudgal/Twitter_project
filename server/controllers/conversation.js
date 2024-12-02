@@ -33,7 +33,7 @@ export const getConversations = async (req, res) => {
       .populate({
         path: "participants",
         match: { _id: { $ne: _id } }, // exluding logedin user details
-        select: "name username profilePicturePath isAdmin",
+        select: "name username profilePicturePath _id isAdmin",
       })
       .populate({
         path: "lastMessage",

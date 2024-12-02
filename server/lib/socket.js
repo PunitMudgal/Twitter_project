@@ -19,8 +19,6 @@ export function getReceiverSocketId(userId) {
 const userSocketMap = {};
 
 io.on("connection", (socket) => {
-  console.log("A user connected - - - ", socket.id);
-  console.log("socket userid handshake - --", socket.handshake.query);
   const userId = socket.handshake.query.userId;
   if (!userId) {
     console.warn("Socket connected without userId");

@@ -1,9 +1,10 @@
+import { getReceiverSocketId, io } from "../lib/socket.js";
 import Conversation from "../models/Conversation.js";
 import Message from "../models/Message.js";
 
 export const createMessage = async (req, res) => {
   try {
-    const { conversationId, text } = req.body;
+    const { conversationId, receiverId, text } = req.body;
     const { _id: userId } = req.user;
 
     const message = new Message({ conversationId, sender: userId, text });
@@ -11,10 +12,23 @@ export const createMessage = async (req, res) => {
       message.save(),
       Conversation.findByIdAndUpdate(conversationId, {
         lastMessage: message._id,
+        updatedAt: new Date(),
       }),
     ]);
+
+    // Notify the receiver via socket
+    try {
+      const receiverSocketId = getReceiverSocketId(receiverId);
+      if (receiverSocketId) {
+        io.to(receiverSocketId).emit("newMessage", savedMessage);
+      }
+    } catch (socketError) {
+      console.error("Socket notification error:", socketError);
+    }
+
     res.status(201).json(savedMessage);
   } catch (error) {
+    console.error("Error in createMessage:", error);
     res.status(500).json({ message: error.message });
   }
 };
