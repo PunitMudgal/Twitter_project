@@ -1,5 +1,5 @@
 import cors from "cors";
-import path from "path";
+// import path from "path";
 import morgan from "morgan";
 import dotenv from "dotenv";
 import helmet from "helmet";
@@ -19,8 +19,6 @@ import conversationRouter from "./router/conversation.js";
 import { app, server } from "./lib/socket.js";
 
 dotenv.config();
-
-const __dirname = path.resolve();
 
 /** MIDDLEWARES */
 app.use(express.json({ extended: false, limit: "50mb" }));
@@ -77,13 +75,13 @@ app.use("/post", postRouter);
 app.use("/conversation", conversationRouter);
 app.use("/message", messageRouter);
 
-if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "../ui/build")));
+// if (process.env.NODE_ENV === "production") {
+//   app.use(express.static(path.join(__dirname, "../ui/build")));
 
-  app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "../ui", "build", "index.html"));
-  });
-}
+//   app.get("*", (req, res) => {
+//     res.sendFile(path.join(__dirname, "../ui", "build", "index.html"));
+//   });
+// }
 
 // DATABASE SETUP
 const port = process.env.PORT || 8080;
