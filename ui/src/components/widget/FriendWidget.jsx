@@ -23,16 +23,26 @@ function FriendWidget({
 
   return (
     <div className="flex gap-2 items-center p-2 text-sm font-semibold rounded-3xl hover:bg-purple-500 hover:bg-opacity-20 ">
-      <Avatar profilePhoto={profilePicturePath} userId={_id} />
+      <Avatar
+        profilePhoto={profilePicturePath}
+        userId={_id}
+        isContact={isContact}
+      />
       <div
-        onClick={() => navigate(`/home/${_id}`)}
+        onClick={() => !isContact && navigate(`/home/${_id}`)}
         className={`flex flex-col cursor-pointer ${
           isContact ? "md:hidden" : "flex"
         } `}
       >
         <p className="flex gap-1 items-center capitalize">
           {truncateUsername(name) || "Forever User"}
-          {isAdmin && <img src={tick} className="h-4 w-4" alt="purpletick" />}
+          {isAdmin && (
+            <img
+              src={tick}
+              className="h-4 w-4"
+              alt="purpletick hover:underline"
+            />
+          )}
         </p>
         <p className="text-gray2 text-xs">
           {lastMessage ? lastMessage : `@${truncateUsername(username)}`}

@@ -2,8 +2,9 @@ import React from "react";
 import deleteIcon from "../../assets/delete.png";
 import { deleteMessage } from "../../store/chatSlice";
 import { useDispatch } from "react-redux";
+import { formatTimeTo12Hour } from "../../fetch/helper";
 
-function Message({ own, text, read, _id }) {
+function Message({ own, text, read, _id, createdAt }) {
   const dispatch = useDispatch();
 
   return (
@@ -19,11 +20,14 @@ function Message({ own, text, read, _id }) {
         />
       )}
       <div
-        className={`p-2 rounded-3xl  max-w-fit ${
+        className={`p-2 pb-0 pl-4 rounded-3xl  max-w-sm text-left flex-wrap ${
           own ? " bg-cyan-700 rounded-br-sm " : "bg-gray-700 rounded-bl-sm "
         }`}
       >
-        {text}
+        <p>{text}</p>
+        <span className="text-xs text-white p-1 float-right">
+          {formatTimeTo12Hour(createdAt)}
+        </span>
       </div>
     </div>
   );

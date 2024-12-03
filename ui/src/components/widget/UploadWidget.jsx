@@ -44,7 +44,7 @@ function UploadWidget({ setPosts }) {
       console.log(pair[0], pair[1]);
     }
 
-    const uploadPromise = createPost(formData);
+    const uploadPromise = createPost(formdData);
     toast.promise(uploadPromise, {
       loading: "Upload Please Wait...",
       success: "Upload Successful",

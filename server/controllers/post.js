@@ -5,17 +5,14 @@ export const createPost = async (req, res) => {
   try {
     const { text, isQuote, parentId } = req.body;
     const { userId } = req.user;
-    // console.log("files ----", req.files);
-    // console.log("files path ----", req.files["picturePath"][0].path);
 
     const picturePath = req.files?.["picturePath"]?.[0]?.path || "";
-    console.log("picturepath - -- ", picturePath);
+
     const newPost = new Post({
       user: userId,
       picturePath,
       text: text || "",
       likes: {},
-      comments: [],
       rootPostId: parentId || null,
       parentId: parentId || null,
       isQuote: isQuote || false,
@@ -234,3 +231,10 @@ export async function deletePost(req, res) {
     res.status(500).json({ message: "Server error" });
   }
 }
+
+// /** COMMENTS */
+// const addComment = () => {
+//   try {
+//     const { text, isQuote } = req.body;
+//   } catch (error) {}
+// };

@@ -103,6 +103,12 @@ export async function createPost(values) {
   }
 }
 
+// export async function createComment(values) {
+//   try{
+//     const {data} = await axiosInstance.post(`/post`)
+//   }
+// }
+
 /** */
 export async function getFriendPosts(userId, page) {
   try {
@@ -194,3 +200,23 @@ export async function deleteUser(userId) {
     toast.error(error.response.data.message);
   }
 }
+
+export const formatTimeTo12Hour = (createdAt) => {
+  if (!createdAt) return ""; // Handle missing or invalid dates
+
+  const date = new Date(createdAt);
+
+  const hours = date.getHours();
+  const minutes = date.getMinutes();
+
+  const period = hours >= 12 ? "PM" : "AM";
+  const formattedHours = hours % 12 || 12; // Convert 0 to 12 for 12-hour format
+  const formattedMinutes = minutes.toString().padStart(2, "0"); // Add leading zero to minutes
+
+  return `${formattedHours}:${formattedMinutes} ${period}`;
+};
+
+export const extractDate = (createdAt) => {
+  const dateObj = new Date(createdAt);
+  return dateObj.toISOString().split("T")[0]; // Extract the date part (YYYY-MM-DD)
+};

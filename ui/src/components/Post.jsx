@@ -10,7 +10,13 @@ import Bookmark from "../assets/bookmark.png";
 import { CgProfile } from "react-icons/cg";
 import { SlOptions } from "react-icons/sl";
 import { useSelector } from "react-redux";
-import { bookmarkPost, deletePost, likeUnlikePost } from "../fetch/helper";
+import {
+  bookmarkPost,
+  deletePost,
+  extractDate,
+  formatTimeTo12Hour,
+  likeUnlikePost,
+} from "../fetch/helper";
 import "../style/profile.css";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -130,7 +136,12 @@ function Post({
           <div className="relative mt-1 flex gap-2 text-sm place-item-center ">
             <p className=" font-semibold text-white">{user?.name}</p>
             <p className=" text-gray-400  ">@{user?.username}</p>
-            <span className=" text-gray-400  ">20h</span>
+            <span className=" text-gray-400  ">
+              {" "}
+              &bull;
+              {formatTimeTo12Hour(createdAt)}
+              &bull; {extractDate(createdAt)}
+            </span>
             <SlOptions
               onClick={() => setMenu(!menu)}
               className="ml-auto text-2xl p-1 rounded-full hover:bg-gray-500 hover:bg-opacity-50 "

@@ -15,9 +15,11 @@ import {
   subscribeToMessages,
   unsubscribeFromMessages,
 } from "../../store/chatSlice";
+import { useNavigate } from "react-router-dom";
 
 function MessageSection() {
   const [menu, setMenu] = useState(false);
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const currentUserId = useSelector((state) => state.auth?.user._id);
   const selectedContact = useSelector((state) => state.chat.selectedContact);
@@ -69,7 +71,12 @@ function MessageSection() {
       <div className="w-full sticky top-0 p-2 flex justify-between items-center border-b border-gray-700 bg-slate-900 z-10">
         <div className="flex gap-2">
           <Avatar profilePhoto={user.profilePicturePath} userId={user._id} />
-          <p className="font-semibold self-center text-lg ">{user.name}</p>
+          <p
+            className="font-semibold self-center text-lg hover:underline cursor-pointer outline-offset-2 "
+            onClick={() => navigate(`/home/${user._id}`)}
+          >
+            {user.name}
+          </p>
         </div>
         <div className="flex gap-1">
           {headerIcons.map((icn) => (

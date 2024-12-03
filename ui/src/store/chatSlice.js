@@ -89,11 +89,18 @@ export const CreateConversations =
 
 export const deleteConversation = (conversationId) => async (dispatch) => {
   try {
-    const { data } = await axiosInstance.delete(
+    const deleteResponse = axiosInstance.delete(
       `conversation/delete-conversation/${conversationId}`
     );
-    dispatch(setRemoveDeletedContact(data._id));
-    dispatch(setSelectedContact(null));
+    toast.promise(deleteResponse, {
+      loading: "Deleting Conversation...",
+      success: "Deleted",
+      error: "Deletion Failed",
+    });
+    deleteResponse.then((data) => {
+      dispatch(setRemoveDeletedContact(data._id));
+      dispatch(setSelectedContact(null));
+    });
   } catch (error) {
     toast.error(error.response.data.message || error.message);
     console.error("Error in CreateConversations:", error);
