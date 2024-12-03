@@ -26,7 +26,10 @@ app.use(helmet());
 app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 app.use(
   cors({
-    origin: "http://localhost:3000", // Frontend URL
+    origin:
+      process.env.NODE_ENV === "development"
+        ? "http://localhost:3000"
+        : "https://twitter-project-six.vercel.app", // Frontend URL
     credentials: true,
   })
 );
