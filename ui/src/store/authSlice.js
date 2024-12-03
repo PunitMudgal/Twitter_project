@@ -49,9 +49,11 @@ export const authSlice = createSlice({
 // auth check
 export const checkAuth = () => async (dispatch) => {
   try {
+    dispatch(setCheckingAuth(true));
     const res = await axiosInstance.get("/auth/check");
     dispatch(setUser(res.data));
     dispatch(connectSocket());
+    dispatch(setCheckingAuth(false));
   } catch (error) {
     console.error("Error in checkAuth:", error.message);
   } finally {

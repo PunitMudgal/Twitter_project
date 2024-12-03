@@ -8,9 +8,9 @@ export default function ProtectRoutes({ children }) {
   // Show a loading state while checking authentication
   if (isCheckingAuth) {
     return (
-      <div className="flex justify-center items-center h-screen w-full bg-transparent flex-col">
+      <div className="flex justify-center items-center h-screen w-full bg-transparent flex-col text-center">
         <img src={Logo} className="h-32 w-auto" alt="logo" />
-        <p className="font-bold font-style2 text-xl">FOREVER</p>
+        <p className="font-extralight tracking-wider marker text-xl">FOREVER</p>
       </div>
     );
   }

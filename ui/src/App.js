@@ -115,9 +115,9 @@ function App() {
     <>
       <Suspense
         fallback={
-          <div className="flex justify-center items-center h-screen w-full bg-transparent flex-col">
+          <div className="flex justify-center items-center h-screen w-full text-center bg-transparent flex-col">
             <img src={Logo} className="h-32 w-auto" alt="logo" />
-            <p className="font-bold font-style2 text-xl">FOREVER</p>
+            <p className="font-extralight tracking-wider text-xl">FOREVER</p>
           </div>
         }
       >
