@@ -24,6 +24,7 @@
     "react-scripts": "5.0.1",
     "reselect": "^5.1.1",
     "socket.io-client": "^4.8.1",
+    "twitter_project": "file:..",
     "web-vitals": "^2.1.4"
   },
   "scripts": {

@@ -1,11 +1,9 @@
 import cors from "cors";
 import path from "path";
-import multer from "multer";
 import morgan from "morgan";
 import dotenv from "dotenv";
 import helmet from "helmet";
 import express from "express";
-import { fileURLToPath } from "url";
 import bodyParser from "body-parser";
 import { uploadPostImage, uploadUserImage } from "./lib/cloudinary.js";
 import Auth from "./middleware/auth.js";
@@ -18,11 +16,11 @@ import messageRouter from "./router/message.js";
 import { updateUser } from "./controllers/user.js";
 import { createPost } from "./controllers/post.js";
 import conversationRouter from "./router/conversation.js";
-// import { app, server } from "../socket/index.js";
 import { app, server } from "./lib/socket.js";
 
 dotenv.config();
-// const app = express();
+
+const __dirname = path.resolve();
 
 /** MIDDLEWARES */
 app.use(express.json({ extended: false, limit: "50mb" }));
@@ -78,6 +76,14 @@ app.use("/user", userRoutes);
 app.use("/post", postRouter);
 app.use("/conversation", conversationRouter);
 app.use("/message", messageRouter);
+
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../ui/build")));
+
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "../ui/build", "index.html"));
+  });
+}
 
 // DATABASE SETUP
 const port = process.env.PORT || 8080;

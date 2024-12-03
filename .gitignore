@@ -13,7 +13,7 @@ server/.env
 /coverage
 
 # production
-/build
+ui/build
 
 # misc
 .DS_Store
