@@ -4,7 +4,9 @@ import toast from "react-hot-toast";
 import { io } from "socket.io-client";
 
 const BASE_URL =
-  import.meta.env.MODE === "development" ? "http://localhost:1414" : "/";
+  import.meta.env.MODE === "development"
+    ? "http://localhost:1414"
+    : "https://twitter-project-iaku.onrender.com";
 
 const initialState = {
   user: null,
