@@ -225,11 +225,3 @@ function EditProfileInfoWidget() {
 }
 
 export default EditProfileInfoWidget;
-
-// src={
-//   previewProfile
-//     ? previewProfile
-//     : user?.profilePicturePath
-//     ? `http://localhost:1414/assets/${user?.profilePicturePath}`
-//     : defaultPhoto
-// }
