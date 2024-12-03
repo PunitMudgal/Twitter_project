@@ -80,7 +80,7 @@ function CenterComp({ isLoading }) {
         {postLoading ? (
           <Loading />
         ) : (
-          posts.map((post) => (
+          posts?.map((post) => (
             <Post key={post._id} {...post} posts={posts} setPosts={setPosts} />
           ))
         )}
