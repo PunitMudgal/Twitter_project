@@ -2,8 +2,8 @@ import axios from "axios";
 
 export const axiosInstance = axios.create({
   baseURL:
-    import.meta.env.MODE === "development"
-      ? "http://localhost:1414"
-      : "https://twitter-project-iaku.onrender.com",
+    process.env.NODE_ENV === "development"
+      ? process.env.REACT_APP_DEV_API_URL
+      : process.env.REACT_APP_PROD_API_URL,
   withCredentials: true,
 });

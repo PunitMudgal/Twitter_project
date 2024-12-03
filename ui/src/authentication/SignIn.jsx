@@ -12,6 +12,10 @@ import { loginUser } from "../store/authSlice";
 import { useDispatch } from "react-redux";
 
 function SignIn() {
+  console.log("NODE_ENV:", process.env.NODE_ENV);
+  console.log("REACT_APP_DEV_API_URL:", process.env.REACT_APP_DEV_API_URL);
+  console.log("REACT_APP_PROD_API_URL:", process.env.REACT_APP_PROD_API_URL);
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
 

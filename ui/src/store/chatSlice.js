@@ -1,8 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import toast from "react-hot-toast";
 import { axiosInstance } from "../fetch/axios";
-import userSlice from "./userSlice";
-import axios from "axios";
 
 const initialState = {
   chat: [], // messages
