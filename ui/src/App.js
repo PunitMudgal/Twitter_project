@@ -30,82 +30,87 @@ const ErrorPage = lazy(() => import("./pages/Error404"));
 function App() {
   const dispatch = useDispatch();
 
-  const router = createBrowserRouter([
-    {
-      path: "/",
-      element: <AppLayoutAuthentication />,
-      children: [
-        {
-          path: "",
-          element: <AppLayoutRegister />,
-          children: [
-            {
-              path: "register-profile",
-              element: <RegisterProfileCard />,
-            },
-          ],
-        },
-        {
-          path: "signin",
-          element: <SignIn />,
-        },
-      ],
-    },
-    {
-      path: "home",
-      element: (
-        <ProtectRoutes>
-          <Home />
-        </ProtectRoutes>
-      ),
-      children: [
-        {
-          path: "",
-          element: <CenterComp isLoading={false} />,
-        },
-        {
-          path: ":id",
-          element: <Profile />,
-          children: [
-            {
-              path: "edit",
-              element: <EditProfileInfoWidget />,
-            },
-            {
-              path: "admin/dashboard",
-              element: <AdminPage />,
-            },
-          ],
-        },
-        {
-          path: ":id/follower&following",
-          element: <FollowerAndFollowing />,
-        },
-        {
-          path: "bookmark",
-          element: <BookmarkPage />,
-        },
-      ],
-    },
-    {
-      path: "/messenger",
-      element: (
-        <ProtectRoutes>
-          <Messenger />
-        </ProtectRoutes>
-      ),
-    },
-    {
-      path: "/:userId/photo/:picturePath",
-      element: (
-        <ProtectRoutes>
-          <ViewPhoto />
-        </ProtectRoutes>
-      ),
-    },
+  const router = createBrowserRouter(
+    [
+      {
+        path: "/",
+        element: <AppLayoutAuthentication />,
+        children: [
+          {
+            path: "",
+            element: <AppLayoutRegister />,
+            children: [
+              {
+                path: "register-profile",
+                element: <RegisterProfileCard />,
+              },
+            ],
+          },
+          {
+            path: "signin",
+            element: <SignIn />,
+          },
+        ],
+      },
+      {
+        path: "home",
+        element: (
+          <ProtectRoutes>
+            <Home />
+          </ProtectRoutes>
+        ),
+        children: [
+          {
+            path: "",
+            element: <CenterComp isLoading={false} />,
+          },
+          {
+            path: ":id",
+            element: <Profile />,
+            children: [
+              {
+                path: "edit",
+                element: <EditProfileInfoWidget />,
+              },
+              {
+                path: "admin/dashboard",
+                element: <AdminPage />,
+              },
+            ],
+          },
+          {
+            path: ":id/follower&following",
+            element: <FollowerAndFollowing />,
+          },
+          {
+            path: "bookmark",
+            element: <BookmarkPage />,
+          },
+        ],
+      },
+      {
+        path: "/messenger",
+        element: (
+          <ProtectRoutes>
+            <Messenger />
+          </ProtectRoutes>
+        ),
+      },
+      {
+        path: "/:userId/photo/:picturePath",
+        element: (
+          <ProtectRoutes>
+            <ViewPhoto />
+          </ProtectRoutes>
+        ),
+      },
 
-    { path: "*", element: <ErrorPage /> },
-  ]);
+      { path: "*", element: <ErrorPage /> },
+    ],
+    {
+      basename: "/Twitter_project", // for hosting on github to tell base url
+    }
+  );
 
   useEffect(() => {
     dispatch(checkAuth());
