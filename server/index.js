@@ -26,12 +26,11 @@ app.use(helmet());
 app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 app.use(
   cors({
-    origin: "*",
-    // origin: [
-    //   "http://localhost:3000",
-    //   "https://twitter-project-six.vercel.app",
-    //   "https://punitmudgal.github.io/Twitter_project/",
-    // ],
+    origin: [
+      "https://punitmudgal.github.io",
+      "https://twitter-project-six.vercel.app",
+      "http://localhost:3000",
+    ],
     credentials: true,
   })
 );

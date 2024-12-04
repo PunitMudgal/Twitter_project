@@ -8,7 +8,11 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "*",
+    origin: [
+      "https://punitmudgal.github.io",
+      "http://localhost:3000",
+      "https://twitter-project-six.vercel.app",
+    ],
   },
 });
 
