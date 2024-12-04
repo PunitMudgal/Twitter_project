@@ -32,7 +32,7 @@ function App() {
 
   const router = createBrowserRouter([
     {
-      path: "/Twitter_project",
+      path: "/",
       element: <AppLayoutAuthentication />,
       children: [
         {
