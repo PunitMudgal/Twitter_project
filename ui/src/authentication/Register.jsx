@@ -39,7 +39,9 @@ function Register() {
         });
 
         const res = await registerPromise;
+        console.log("res poonse", res);
         navigate("/register-profile");
+        localStorage.setItem("token", res.token);
       } catch (error) {
         if (
           error.response &&

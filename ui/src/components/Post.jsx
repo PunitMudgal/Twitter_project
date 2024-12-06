@@ -20,6 +20,7 @@ import {
 import "../style/profile.css";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { selectUser } from "../store/authSlice";
 
 function Post({
   _id,
@@ -37,15 +38,16 @@ function Post({
   const [likes, setLikes] = useState(initialLikes);
   const menuRef = useRef(null);
 
-  const { _id: currentUserId, bookmark } = useSelector(
-    (state) => state.auth?.user
-  );
+  const Currentuser = useSelector(selectUser);
+
+  const { _id: currentUserId, bookmark } = Currentuser;
+
   const isAdmin = useSelector((state) => state.auth?.user?.isAdmin);
   let isSelf = currentUserId === user?._id;
 
   const navigate = useNavigate();
   const isLiked = Boolean(likes[currentUserId]);
-  const isBookmarked = Boolean(bookmark.includes(_id));
+  const isBookmarked = Boolean(bookmark?.includes(_id));
 
   const likeUnlikeHandle = async () => {
     const { post } = await likeUnlikePost(_id, currentUserId);

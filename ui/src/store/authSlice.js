@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { axiosInstance } from "../fetch/axios";
 import toast from "react-hot-toast";
 import { io } from "socket.io-client";
+import axios from "axios";
 
 const BASE_URL =
   process.env.NODE_ENV === "development"
@@ -66,7 +67,7 @@ export const registerUser = (userData) => async (dispatch) => {
   try {
     const response = await axiosInstance.post(`/auth/register`, userData);
     dispatch(connectSocket());
-    return response;
+    return response.data;
   } catch (error) {
     toast.error(error.response.data.message);
   }
@@ -82,7 +83,7 @@ export const loginUser =
         password,
       });
       dispatch(connectSocket());
-      return Promise.resolve({ data });
+      return Promise.resolve(data);
     } catch (error) {
       toast.error(error.response.data.message);
     }

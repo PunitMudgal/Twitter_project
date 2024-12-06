@@ -4,7 +4,7 @@ import Logo from "../assets/blue.png";
 
 export default function ProtectRoutes({ children }) {
   const { user, isCheckingAuth } = useSelector((state) => state.auth);
-
+  const token = localStorage.getItem("token");
   // Show a loading state while checking authentication
   if (isCheckingAuth) {
     return (
@@ -15,7 +15,7 @@ export default function ProtectRoutes({ children }) {
     );
   }
 
-  if (!user) {
+  if (!token) {
     return <Navigate to="/" />;
   }
 

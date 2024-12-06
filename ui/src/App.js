@@ -9,6 +9,7 @@ import Messenger from "./pages/Messenger";
 import { checkAuth } from "./store/authSlice";
 import { useDispatch } from "react-redux";
 import ViewPhoto from "./components/ViewPhoto";
+import axios from "axios";
 
 // const ViewPhoto = lazy(() => import("./components/ViewPhoto"));
 const Home = lazy(() => import("./pages/Home"));
@@ -29,6 +30,7 @@ const ErrorPage = lazy(() => import("./pages/Error404"));
 
 function App() {
   const dispatch = useDispatch();
+  const token = localStorage.getItem("token");
 
   const router = createBrowserRouter(
     [
@@ -55,9 +57,9 @@ function App() {
       {
         path: "home",
         element: (
-          <ProtectRoutes>
-            <Home />
-          </ProtectRoutes>
+          // <ProtectRoutes>
+          <Home />
+          // {/* </ProtectRoutes> */}
         ),
         children: [
           {
@@ -115,6 +117,10 @@ function App() {
   useEffect(() => {
     dispatch(checkAuth());
   }, [dispatch]);
+
+  if (token) {
+    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+  }
 
   return (
     <>

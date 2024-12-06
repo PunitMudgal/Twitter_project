@@ -63,6 +63,7 @@ function LeftComp() {
   }, []);
 
   const handleLogout = () => {
+    localStorage.removeItem("token");
     dispatch(Logout());
     dispatch(setUser(null));
     navigate("/");

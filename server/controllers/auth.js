@@ -37,7 +37,7 @@ export const register = async (req, res) => {
     });
 
     if (newUser) {
-      generateToken(newUser._id, res);
+      const token = generateToken(newUser._id, res);
       await newUser.save();
 
       res.status(201).json({
@@ -46,6 +46,7 @@ export const register = async (req, res) => {
         username: newUser.username,
         profilePicturePath: newUser.profilePicturePath,
         isAdmin: newUser.isAdmin,
+        token: token,
       });
     } else {
       res.status(400).json({ message: "invalid user data" });
@@ -71,13 +72,15 @@ export async function login(req, res) {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).json({ msg: "Invalid credentials" });
 
-    generateToken(user._id, res);
+    const token = generateToken(user._id, res);
+
     res.status(200).json({
       userId: user._id,
       name: user.name,
       username: user.username,
       profilePicturePath: user.profilePicturePath,
       isAdmin: user.isAdmin,
+      token: token,
     });
   } catch (error) {
     res.status(500).json({ error: error.message });

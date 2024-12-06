@@ -8,7 +8,7 @@ import "../style/authenticationStyle.css";
 import logo from "../assets/blue.png";
 import { loginVerify } from "../helper/validation.js";
 import toast, { Toaster } from "react-hot-toast";
-import { loginUser } from "../store/authSlice";
+import { checkAuth, loginUser } from "../store/authSlice";
 import { useDispatch } from "react-redux";
 
 function SignIn() {
@@ -30,7 +30,9 @@ function SignIn() {
         success: "Login Success",
         error: "Login Failed!",
       });
-      loginPromise.then(() => {
+      loginPromise.then((data) => {
+        localStorage.setItem("token", data.token);
+        dispatch(checkAuth());
         navigate("/home");
       });
     },
